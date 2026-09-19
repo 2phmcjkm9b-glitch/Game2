@@ -20,7 +20,10 @@ final class MenuScene: SKScene {
         let button = NeonButton(title: "НАЧАТЬ", size: CGSize(width: 220, height: 58), color: Palette.cyan)
         button.position = CGPoint(x: size.width/2, y: size.height*0.48)
         button.action = { [weak self] in
-            self?.presentScene(HubScene(size: self?.size ?? .zero), transition: .doorsOpenVertical(withDuration: 0.5))
+            guard let self else { return }
+            let next = HubScene(size: self.size)
+            next.scaleMode = .resizeFill
+            self.view?.presentScene(next, transition: .doorsOpenVertical(withDuration: 0.5))
         }
         addChild(button)
         addChild(FX.vignette(size: size))
