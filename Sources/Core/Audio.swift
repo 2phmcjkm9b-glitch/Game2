@@ -2,34 +2,49 @@ import AVFoundation
 
 final class Audio {
     static let shared = Audio()
+
     private let engine = AVAudioEngine()
     private var started = false
     private let lock = NSLock()
 
     private init() {}
 
-    func start() {
+    @discardableResult
+    private func ensureStarted() -> Bool {
         lock.lock()
         defer { lock.unlock() }
-        guard !started else { return }
-        started = true
+
+        if started && engine.isRunning { return true }
+
         do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
             try engine.start()
+            started = true
+            return true
         } catch {
-            print("Audio start failed:", error)
+            print("Audio unavailable:", error)
             started = false
+            return false
         }
+    }
+
+    func start() {
+        _ = ensureStarted()
     }
 
     func tone(freq: Double, duration: Double = 0.15, volume: Float = 0.25,
               type: Waveform = .sine) {
-        guard engine.isRunning else { return }
+        guard duration > 0, volume > 0, ensureStarted() else { return }
+
         let format = engine.mainMixerNode.outputFormat(forBus: 0)
         let sr = format.sampleRate
+        guard sr > 0, format.channelCount > 0 else { return }
+
         let frames = AVAudioFrameCount(sr * duration)
-        guard let buf = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames) else { return }
+        guard frames > 0,
+              let buf = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames) else { return }
         buf.frameLength = frames
 
         if let channels = buf.floatChannelData {
@@ -68,5 +83,7 @@ final class Audio {
         tone(freq: 200, duration: 0.6, volume: 0.08, type: .noise)
     }
 
-    enum Waveform { case sine, square, noise }
+    enum Waveform {
+        case sine, square, noise
+    }
 }

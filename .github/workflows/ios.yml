@@ -2,6 +2,8 @@ name: iOS Build
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 jobs:
   build:
@@ -14,6 +16,10 @@ jobs:
         run: brew install xcodegen || brew upgrade xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
+      - name: Make project compatible with Xcode 15
+        run: |
+          sed -i '' 's/objectVersion = 77;/objectVersion = 56;/' School13.xcodeproj/project.pbxproj
+          sed -i '' 's/compatibilityVersion = "Xcode 16.0";/compatibilityVersion = "Xcode 15.0";/' School13.xcodeproj/project.pbxproj
       - name: Build unsigned .app
         run: |
           xcodebuild -project School13.xcodeproj -scheme School13 -configuration Release -sdk iphoneos -derivedDataPath build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO build
