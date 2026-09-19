@@ -11,12 +11,14 @@ jobs:
       - name: Check Xcode
         run: xcodebuild -version
       - name: Install XcodeGen
-        run: brew install xcodegen
+        run: brew install xcodegen || brew upgrade xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
       - name: Build unsigned .app
         run: |
           xcodebuild -project School13.xcodeproj -scheme School13 -configuration Release -sdk iphoneos -derivedDataPath build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO build
+      - name: Verify app
+        run: test -d build/Build/Products/Release-iphoneos/School13.app
       - name: Package unsigned .ipa
         run: |
           mkdir -p Payload
