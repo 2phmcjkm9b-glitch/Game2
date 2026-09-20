@@ -45,6 +45,8 @@ enum Trial: Int, CaseIterable {
             return 1
         case .lastDesk, .stairs, .archiveChoice, .archiveBranch, .schoolBell, .archiveCount, .lastDoor:
             return 2
+        default:
+            return 1
         }
     }
 
