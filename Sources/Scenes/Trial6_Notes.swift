@@ -7,6 +7,8 @@ final class Trial6_Notes: SKScene {
 
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
+        Audio.shared.start()
+        Audio.shared.drone(freq: 42, duration: 2.0, volume: 0.07)
 
         let title = SKLabelNode(text: "ЗАПИСКИ")
         title.fontName = "AvenirNext-Heavy"
