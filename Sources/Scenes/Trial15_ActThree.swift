@@ -208,11 +208,7 @@ class ActThreeTrialBase: SKScene {
     private func updateStatus(){ (childNode(withName:"//status") as? SKLabelNode)?.text="Введено: "+input.map(String.init).joined(separator:" ") }
     private func resetInput(){
         input.removeAll()
-        if trial == .notebook {
-            (childNode(withName:"//status") as? SKLabelNode)?.text="ОШИБКА — снова: 0 / 4"
-        } else {
-            (childNode(withName:"//status") as? SKLabelNode)?.text="ОШИБКА — СНАЧАЛА"
-        }
+        (childNode(withName:"//status") as? SKLabelNode)?.text="ОШИБКА — СНАЧАЛА"
         failPulse(self)
     }
     private func failPulse(_ node:SKNode){ Haptics.error(); Audio.shared.tone(freq:90,duration:0.12,volume:0.16); node.run(.sequence([.scale(to:0.92,duration:0.06),.scale(to:1,duration:0.06)])) }
