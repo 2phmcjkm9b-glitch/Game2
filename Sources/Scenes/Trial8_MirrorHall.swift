@@ -76,7 +76,7 @@ class ActTwoTrialBase: SKScene {
     }
 
     private func card(_ title: String) -> SKShapeNode {
-        let box = SKShapeNode(rectOf: CGSize(width: size.width * 0.82, height: 300), cornerRadius: 18)
+        let box = SKShapeNode(rectOf: CGSize(width: size.width * 0.82, height: 330), cornerRadius: 18)
         box.position = CGPoint(x: size.width / 2, y: size.height * 0.48)
         box.fillColor = SKColor(white: 0.045, alpha: 1)
         box.strokeColor = Palette.blood
@@ -165,7 +165,7 @@ class ActTwoTrialBase: SKScene {
             let col = i % 5
             let row = i / 5
             let b = SKShapeNode(rectOf: CGSize(width: 48, height: 34), cornerRadius: 7)
-            b.position = CGPoint(x: (CGFloat(col) - 2) * 57, y: 92 - CGFloat(row) * 34)
+            b.position = CGPoint(x: (CGFloat(col) - 2) * 57, y: 80 - CGFloat(row) * 31)
             b.fillColor = SKColor(white: 0.08, alpha: 1)
             b.strokeColor = Palette.magenta
             b.name = "letter_\(i)_\(letters[i])"
@@ -177,7 +177,7 @@ class ActTwoTrialBase: SKScene {
         }
         let selected = SKLabelNode(text: "Выбрано: ")
         selected.name = "word"; selected.fontName = "AvenirNext-Bold"; selected.fontSize = 13
-        selected.fontColor = Palette.cyan; selected.position = CGPoint(x: 0, y: -128)
+        selected.fontColor = Palette.cyan; selected.position = CGPoint(x: 0, y: -155)
         box.addChild(selected)
         wordLabel = selected
         wordProgress = ""
