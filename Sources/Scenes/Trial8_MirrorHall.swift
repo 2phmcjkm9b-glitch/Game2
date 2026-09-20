@@ -26,7 +26,7 @@ class ActTwoTrialBase: SKScene {
         Audio.shared.start()
         Audio.shared.drone(freq: 38, duration: 2.0, volume: 0.11)
 
-        let title = SKLabelNode(text: "\(trial.rawValue). \(trial.title.uppercased())")
+        let title = SKLabelNode(text: "\(String(format: "%02d", trial.displayNumber)). \(trial.title.uppercased())")
         title.fontName = "AvenirNext-Heavy"
         title.fontSize = 23
         title.fontColor = Palette.blood
