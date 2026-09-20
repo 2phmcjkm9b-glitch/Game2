@@ -8,7 +8,7 @@ enum GameFlow {
 
         if let piece = trial.puzzlePiece {
             SaveManager.shared.collectPuzzlePiece(piece)
-            showPuzzlePieceReward(in: scene, piece: piece)
+            showPuzzlePieceReward(in: scene, piece: piece, trial: trial)
             return
         }
 
@@ -26,7 +26,7 @@ enum GameFlow {
         ]))
     }
 
-    private static func showPuzzlePieceReward(in scene: SKScene, piece: Int) {
+    private static func showPuzzlePieceReward(in scene: SKScene, piece: Int, trial: Trial) {
         let overlay = SKNode()
         overlay.name = "puzzleReward"
         overlay.zPosition = 20000
@@ -80,7 +80,7 @@ enum GameFlow {
             board.addChild(pieceNode)
         }
 
-        let pieceLabel = SKLabelNode(text: "ФРАГМЕНТ (piece) / 5")
+        let pieceLabel = SKLabelNode(text: "ФРАГМЕНТ \(piece) / 5")
         pieceLabel.fontName = "AvenirNext-Bold"
         pieceLabel.fontSize = 15
         pieceLabel.fontColor = Palette.amber
