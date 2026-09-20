@@ -17,18 +17,12 @@ final class HubScene: SKScene {
 
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
-        FX.dust(in: self, count: 30)
-        addChild(VignetteNode(size: size, intensity: act == 1 ? 0.8 : 0.92))
+        FX.dust(in: self, count: 18)
         buildHeader()
         buildRooms()
         buildBackButton()
         buildActSwitch()
         Audio.shared.start()
-        Audio.shared.drone(
-            freq: act == 1 ? 52 : 38,
-            duration: 2.5,
-            volume: act == 1 ? 0.07 : 0.11
-        )
     }
 
     private func buildHeader() {
@@ -51,7 +45,7 @@ final class HubScene: SKScene {
             let locked = isLocked(trial)
             let door = makeDoor(trial, done: done, locked: locked)
             door.position = p
-            door.name = "trial_(trial.rawValue)"
+            door.name = "trial_\(trial.rawValue)"
             addChild(door)
         }
     }
@@ -83,7 +77,7 @@ final class HubScene: SKScene {
         rect.glowWidth = locked ? 0 : (done ? 4 : 8)
         node.addChild(rect)
 
-        let number = SKLabelNode(text: "(trial.rawValue)")
+        let number = SKLabelNode(text: "\(trial.rawValue)")
         number.fontName = "AvenirNext-Heavy"
         number.fontSize = 22
         number.fontColor = locked ? Palette.textDim : Palette.text
