@@ -30,7 +30,7 @@ final class HubScene: SKScene {
 
             let door = makeDoor(trial: trial, done: done, locked: locked)
             door.position = pos
-            door.name = "trial_(trial.rawValue)"
+            door.name = "trial_\\(trial.rawValue)"
             addChild(door)
         }
 
@@ -71,7 +71,7 @@ final class HubScene: SKScene {
         rect.glowWidth = locked ? 0 : (done ? 4 : 8)
         node.addChild(rect)
 
-        let num = SKLabelNode(text: "(trial.rawValue)")
+        let num = SKLabelNode(text: "\\(trial.rawValue)")
         num.fontName = "AvenirNext-Heavy"
         num.fontSize = 22
         num.fontColor = locked ? Palette.textDim : Palette.text
