@@ -25,70 +25,65 @@ enum FX {
         node.run(.repeat(action, count: count))
     }
 
-    static func dust(in scene: SKScene, count: Int = 40) {
+    static func dust(in scene: SKScene, count: Int = 30) {
         for _ in 0..<count {
-            let p = SKShapeNode(circleOfRadius: CGFloat.random(in: 0.6...1.6))
-            p.fillColor = SKColor(white: 1, alpha: 0.25)
+            let p = SKShapeNode(circleOfRadius: CGFloat.random(in: 0.5...1.4))
+            p.fillColor = SKColor(white: 1, alpha: 0.16)
             p.strokeColor = .clear
             p.position = CGPoint(x: .random(in: 0...scene.size.width),
                                  y: .random(in: 0...scene.size.height))
-            p.zPosition = 500
-            scene.addChild(p)
+            p.zPosition = 2
             let dur = TimeInterval.random(in: 6...14)
             p.run(.repeatForever(.sequence([
                 .group([
-                    .moveBy(x: .random(in: -30...30), y: .random(in: 40...120), duration: dur),
+                    .moveBy(x: .random(in: -24...24), y: .random(in: 35...110), duration: dur),
                     .fadeAlpha(to: 0, duration: dur)
                 ]),
                 .run {
                     p.position = CGPoint(x: .random(in: 0...scene.size.width), y: -10)
-                    p.alpha = 0.25
+                    p.alpha = 0.16
                 }
             ])))
+            scene.addChild(p)
         }
     }
 
     static func vignette(size: CGSize, intensity: CGFloat = 0.7) -> SKSpriteNode {
-        let n = VignetteNode(size: size, intensity: intensity)
-        return n
+        return VignetteNode(size: size, intensity: intensity)
     }
 
-
     static func atmosphere(in scene: SKScene, accent: SKColor = Palette.cyan) {
-        let glow = SKShapeNode(circleOfRadius: max(scene.size.width, scene.size.height) * 0.32)
-        glow.position = CGPoint(x: scene.size.width * 0.5, y: scene.size.height * 0.48)
-        glow.fillColor = accent.withAlphaComponent(0.035)
-        glow.strokeColor = accent.withAlphaComponent(0.12)
+        let glow = SKShapeNode(circleOfRadius: max(scene.size.width, scene.size.height) * 0.34)
+        glow.position = CGPoint(x: scene.size.width * 0.50, y: scene.size.height * 0.47)
+        glow.fillColor = accent.withAlphaComponent(0.025)
+        glow.strokeColor = accent.withAlphaComponent(0.09)
         glow.lineWidth = 1
         glow.zPosition = -10
         scene.addChild(glow)
         glow.run(.repeatForever(.sequence([
-            .group([.scale(to: 1.08, duration: 2.8), .fadeAlpha(to: 0.045, duration: 2.8)]),
-            .group([.scale(to: 0.94, duration: 2.8), .fadeAlpha(to: 0.12, duration: 2.8)])
+            .group([.scale(to: 1.08, duration: 3.0), .fadeAlpha(to: 0.035, duration: 3.0)]),
+            .group([.scale(to: 0.92, duration: 3.0), .fadeAlpha(to: 0.10, duration: 3.0)])
         ])))
-        for i in 0..<18 {
+
+        for i in 0..<22 {
             let line = SKShapeNode(rectOf: CGSize(width: scene.size.width, height: 1))
-            line.position = CGPoint(x: scene.size.width / 2, y: CGFloat(i) * 34)
-            line.fillColor = accent.withAlphaComponent(0.025)
+            line.position = CGPoint(x: scene.size.width / 2, y: CGFloat(i) * 30)
+            line.fillColor = accent.withAlphaComponent(0.018)
             line.strokeColor = .clear
             line.zPosition = -5
             scene.addChild(line)
-            line.run(.repeatForever(.sequence([
-                .fadeAlpha(to: 0.06, duration: 1.8),
-                .fadeAlpha(to: 0.015, duration: 1.8)
-            ])))
         }
-        dust(in: scene, count: 24)
+        dust(in: scene, count: 22)
     }
 
     static func glitchTitle(_ node: SKNode) {
         node.run(.repeatForever(.sequence([
-            .wait(forDuration: 2.4),
-            .moveBy(x: -2, y: 0, duration: 0.025),
-            .fadeAlpha(to: 0.72, duration: 0.025),
-            .moveBy(x: 4, y: 0, duration: 0.025),
-            .moveBy(x: -2, y: 0, duration: 0.025),
-            .fadeAlpha(to: 1, duration: 0.05)
+            .wait(forDuration: 2.8),
+            .moveBy(x: -3, y: 0, duration: 0.025),
+            .fadeAlpha(to: 0.68, duration: 0.025),
+            .moveBy(x: 6, y: 0, duration: 0.025),
+            .moveBy(x: -3, y: 0, duration: 0.025),
+            .fadeAlpha(to: 1, duration: 0.06)
         ])))
     }
 
@@ -107,10 +102,33 @@ enum FX {
         ]), completion: { ring.removeFromParent() })
     }
 
-    static func pulse(_ node: SKNode, scale: CGFloat = 1.06, duration: TimeInterval = 1.2) {
+    static func pulse(_ node: SKNode, scale: CGFloat = 1.04, duration: TimeInterval = 1.2) {
         node.run(.repeatForever(.sequence([
             .scale(to: scale, duration: duration),
             .scale(to: 1, duration: duration)
+        ])))
+    }
+
+    static func cardGlow(_ node: SKNode, color: SKColor, radius: CGFloat = 8) {
+        guard let shape = node as? SKShapeNode else { return }
+        shape.glowWidth = radius
+        shape.run(.repeatForever(.sequence([
+            .fadeAlpha(to: 0.78, duration: 1.4),
+            .fadeAlpha(to: 1.0, duration: 1.4)
+        ])))
+        shape.strokeColor = color
+    }
+
+    static func scanline(in scene: SKScene, color: SKColor = Palette.cyan) {
+        let line = SKShapeNode(rectOf: CGSize(width: scene.size.width, height: 2))
+        line.fillColor = color.withAlphaComponent(0.08)
+        line.strokeColor = .clear
+        line.position = CGPoint(x: scene.size.width / 2, y: scene.size.height + 5)
+        line.zPosition = 50
+        scene.addChild(line)
+        line.run(.repeatForever(.sequence([
+            .moveTo(y: -5, duration: 5.5),
+            .moveTo(y: scene.size.height + 5, duration: 0.01)
         ])))
     }
 }
