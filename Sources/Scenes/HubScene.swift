@@ -17,104 +17,149 @@ final class HubScene: SKScene {
     override func didMove(to view: SKView) {
         removeAllChildren()
         backgroundColor = Palette.bg
-        FX.atmosphere(in: self, accent: act == 2 ? Palette.blood : Palette.cyan)
+        let accent = act == 2 ? Palette.blood : Palette.cyan
+        FX.atmosphere(in: self, accent: accent)
+        FX.scanline(in: self, color: accent)
         buildHeader()
         buildLevels()
         buildBackButton()
+        addChild(FX.vignette(size: size, intensity: 0.68))
     }
 
     private func buildHeader() {
+        let tag = SKLabelNode(text: act == 1 ? "ЗАПАДНОЕ КРЫЛО" : "НИЖНИЙ УРОВЕНЬ")
+        tag.fontName = "AvenirNext-Bold"
+        tag.fontSize = 10
+        tag.fontColor = act == 1 ? Palette.cyan : Palette.blood
+        tag.position = CGPoint(x: size.width / 2, y: size.height * 0.86)
+        tag.zPosition = 20
+        addChild(tag)
+
         let title = SKLabelNode(text: act == 1 ? "КАРТА ШКОЛЫ" : "ПОДВАЛ")
-        title.fontName = "AvenirNext-Bold"
-        title.fontSize = 24
-        title.fontColor = act == 1 ? Palette.text : Palette.blood
-        title.position = CGPoint(x: size.width / 2, y: size.height * 0.70)
+        title.fontName = "AvenirNext-Heavy"
+        title.fontSize = 26
+        title.fontColor = Palette.text
+        title.position = CGPoint(x: size.width / 2, y: size.height * 0.775)
         title.zPosition = 20
         addChild(title)
-        FX.pulse(title, scale: 1.025, duration: 1.6)
+        FX.pulse(title, scale: 1.018, duration: 1.8)
         FX.glitchTitle(title)
 
-        let subtitle = SKLabelNode(text: "АКТ \(act) • выбери доступный уровень")
+        let subtitle = SKLabelNode(text: act == 1 ? "АКТ I • ЗДЕСЬ ВСЁ НАЧАЛОСЬ" : "АКТ II • НИЖЕ УЖЕ НЕКУДА")
         subtitle.fontName = "AvenirNext-Medium"
-        subtitle.fontSize = 15
+        subtitle.fontSize = 11
         subtitle.fontColor = Palette.textDim
-        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.66)
+        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.735)
         subtitle.zPosition = 20
         addChild(subtitle)
+
+        let rule = SKShapeNode(rectOf: CGSize(width: size.width * 0.72, height: 1))
+        rule.position = CGPoint(x: size.width / 2, y: size.height * 0.705)
+        rule.fillColor = act == 1 ? Palette.cyan : Palette.blood
+        rule.strokeColor = .clear
+        rule.alpha = 0.35
+        addChild(rule)
     }
 
     private func buildLevels() {
         levelNodes.removeAll()
 
-        let trials = act == 1 ? Array(Trial.allCases.filter { $0.rawValue <= 10 }) : Array(Trial.allCases.filter { $0.rawValue >= 11 })
+        let trials = act == 1
+            ? Array(Trial.allCases.filter { $0.rawValue <= 10 })
+            : Array(Trial.allCases.filter { $0.rawValue >= 11 })
+
         let positions: [CGPoint] = [
-            CGPoint(x: size.width * 0.17, y: size.height * 0.62),
-            CGPoint(x: size.width * 0.39, y: size.height * 0.62),
-            CGPoint(x: size.width * 0.61, y: size.height * 0.62),
-            CGPoint(x: size.width * 0.83, y: size.height * 0.62),
-            CGPoint(x: size.width * 0.17, y: size.height * 0.45),
-            CGPoint(x: size.width * 0.39, y: size.height * 0.45),
-            CGPoint(x: size.width * 0.61, y: size.height * 0.45),
-            CGPoint(x: size.width * 0.83, y: size.height * 0.45),
-            CGPoint(x: size.width * 0.28, y: size.height * 0.28),
-            CGPoint(x: size.width * 0.50, y: size.height * 0.28),
-            CGPoint(x: size.width * 0.72, y: size.height * 0.28)
+            CGPoint(x: size.width * 0.17, y: size.height * 0.60),
+            CGPoint(x: size.width * 0.39, y: size.height * 0.60),
+            CGPoint(x: size.width * 0.61, y: size.height * 0.60),
+            CGPoint(x: size.width * 0.83, y: size.height * 0.60),
+            CGPoint(x: size.width * 0.17, y: size.height * 0.445),
+            CGPoint(x: size.width * 0.39, y: size.height * 0.445),
+            CGPoint(x: size.width * 0.61, y: size.height * 0.445),
+            CGPoint(x: size.width * 0.83, y: size.height * 0.445),
+            CGPoint(x: size.width * 0.28, y: size.height * 0.285),
+            CGPoint(x: size.width * 0.50, y: size.height * 0.285),
+            CGPoint(x: size.width * 0.72, y: size.height * 0.285)
         ]
 
         for (index, trial) in trials.enumerated() where index < positions.count {
             let completed = SaveManager.shared.data.completedTrials.contains(trial.rawValue)
-            // Все уровни открыты сразу для тестирования.
-            let unlocked = true
+            let accent = act == 1 ? Palette.cyan : Palette.blood
 
-            let node = SKShapeNode(rectOf: CGSize(width: size.width * 0.24, height: 76), cornerRadius: 12)
+            let node = SKShapeNode(rectOf: CGSize(width: size.width * 0.205, height: 67), cornerRadius: 13)
             node.position = positions[index]
             node.name = "level_\(trial.rawValue)"
-            node.fillColor = SKColor(white: 0.07, alpha: 1)
-            node.strokeColor = unlocked ? (completed ? Palette.amber : Palette.cyan) : Palette.textDim
-            node.lineWidth = 2
+            node.fillColor = Palette.panel
+            node.strokeColor = completed ? Palette.amber : accent
+            node.lineWidth = completed ? 2.5 : 1.3
+            node.glowWidth = completed ? 7 : 3
             node.zPosition = 5
 
-            let number = SKLabelNode(text: "\(trial.rawValue)")
+            let marker = SKShapeNode(circleOfRadius: 5)
+            marker.position = CGPoint(x: -size.width * 0.078, y: 22)
+            marker.fillColor = completed ? Palette.amber : accent
+            marker.strokeColor = .clear
+            marker.name = node.name
+            node.addChild(marker)
+
+            let number = SKLabelNode(text: String(format: "%02d", trial.rawValue))
             number.fontName = "AvenirNext-Heavy"
-            number.fontSize = 25
-            number.fontColor = unlocked ? Palette.text : Palette.textDim
-            number.position = CGPoint(x: 0, y: 12)
+            number.fontSize = 23
+            number.fontColor = Palette.text
+            number.position = CGPoint(x: 0, y: 10)
             number.verticalAlignmentMode = .center
             number.name = node.name
             node.addChild(number)
 
-            let label = SKLabelNode(text: unlocked ? trial.title : "ЗАКРЫТО")
+            let label = SKLabelNode(text: trial.title.uppercased())
             label.fontName = "AvenirNext-Bold"
-            label.fontSize = 10
-            label.fontColor = unlocked ? Palette.text : Palette.textDim
-            label.position = CGPoint(x: 0, y: -18)
+            label.fontSize = 8.5
+            label.fontColor = Palette.textDim
+            label.position = CGPoint(x: 0, y: -17)
             label.verticalAlignmentMode = .center
             label.name = node.name
             node.addChild(label)
 
+            if completed {
+                let done = SKLabelNode(text: "✓")
+                done.fontName = "AvenirNext-Heavy"
+                done.fontSize = 13
+                done.fontColor = Palette.amber
+                done.position = CGPoint(x: size.width * 0.075, y: 20)
+                done.name = node.name
+                node.addChild(done)
+            }
+
             addChild(node)
-            FX.pulse(node, scale: 1.025, duration: 1.7 + Double(index % 3) * 0.2)
-            node.run(.fadeAlpha(to: 0.82, duration: 0.01))
+            FX.cardGlow(node, color: completed ? Palette.amber : accent, radius: completed ? 7 : 4)
             levelNodes.append(node)
         }
+
+        let progress = SKLabelNode(text: "21 СЕКТОРОВ • ВСЕ ДОСТУПНЫ")
+        progress.fontName = "AvenirNext-Medium"
+        progress.fontSize = 9
+        progress.fontColor = Palette.textFaint
+        progress.position = CGPoint(x: size.width / 2, y: size.height * 0.19)
+        progress.zPosition = 20
+        addChild(progress)
     }
 
     private func buildBackButton() {
-        let back = SKLabelNode(text: "← НАЗАД")
+        let back = SKLabelNode(text: "← МЕНЮ")
         back.fontName = "AvenirNext-Bold"
-        back.fontSize = 20
+        back.fontSize = 16
         back.fontColor = Palette.text
         back.name = "back"
-        back.position = CGPoint(x: 68, y: 40)
+        back.position = CGPoint(x: 58, y: 34)
         back.zPosition = 30
         addChild(back)
 
-        let switchButton = SKLabelNode(text: act == 1 ? "АКТ II →" : "← АКТ I")
+        let switchButton = SKLabelNode(text: act == 1 ? "АКТ II  →" : "←  АКТ I")
         switchButton.fontName = "AvenirNext-Bold"
-        switchButton.fontSize = 18
-        switchButton.fontColor = Palette.blood
+        switchButton.fontSize = 16
+        switchButton.fontColor = act == 1 ? Palette.blood : Palette.cyan
         switchButton.name = "switchAct"
-        switchButton.position = CGPoint(x: size.width - 68, y: 40)
+        switchButton.position = CGPoint(x: size.width - 58, y: 34)
         switchButton.zPosition = 30
         addChild(switchButton)
     }
@@ -132,8 +177,7 @@ final class HubScene: SKScene {
             }
 
             if current.name == "switchAct" {
-                let nextAct = act == 1 ? 2 : 1
-                let hub = HubScene(size: size, act: nextAct)
+                let hub = HubScene(size: size, act: act == 1 ? 2 : 1)
                 hub.scaleMode = scaleMode
                 view?.presentScene(hub, transition: .fade(withDuration: 0.25))
                 return
@@ -151,7 +195,6 @@ final class HubScene: SKScene {
     }
 
     private func launchIfUnlocked(_ trial: Trial) {
-        // Все уровни временно открыты для тестирования.
         let scene: SKScene
         switch trial {
         case .mirror: scene = Trial1_Mirror(size: size)
@@ -170,8 +213,8 @@ final class HubScene: SKScene {
         case .lastDesk: scene = Trial14_LastDesk(size: size)
         case .director: scene = Trial15_Director(size: size)
         case .stairs: scene = Trial16_Stairs(size: size)
-                case .classZero: scene = Trial18_ClassZero(size: size)
-                case .schoolBell: scene = Trial20_SchoolBell(size: size)
+        case .classZero: scene = Trial18_ClassZero(size: size)
+        case .schoolBell: scene = Trial20_SchoolBell(size: size)
         case .lastDoor: scene = Trial21_LastDoor(size: size)
         }
 
