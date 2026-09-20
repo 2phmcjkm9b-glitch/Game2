@@ -503,11 +503,12 @@ final class HundredTrialScene: SKScene {
             fail()
             return
         }
-        for i in input.indices where input[i] != sequence[i] {
+        let expected = level.params["reverse"] == 1 ? Array(sequence.reversed()) : sequence
+        for i in input.indices where input[i] != expected[i] {
             fail()
             return
         }
-        if input.count == sequence.count {
+        if input.count == expected.count {
             solve(true)
         }
     }
