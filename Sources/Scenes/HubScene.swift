@@ -27,7 +27,7 @@ final class HubScene: SKScene {
         title.fontName = "AvenirNext-Bold"
         title.fontSize = 24
         title.fontColor = act == 1 ? Palette.text : Palette.blood
-        title.position = CGPoint(x: size.width / 2, y: size.height * 0.82)
+        title.position = CGPoint(x: size.width / 2, y: size.height * 0.76)
         title.zPosition = 20
         addChild(title)
 
@@ -35,7 +35,7 @@ final class HubScene: SKScene {
         subtitle.fontName = "AvenirNext-Medium"
         subtitle.fontSize = 15
         subtitle.fontColor = Palette.textDim
-        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.77)
+        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.71)
         subtitle.zPosition = 20
         addChild(subtitle)
     }
@@ -56,13 +56,8 @@ final class HubScene: SKScene {
 
         for (index, trial) in trials.enumerated() where index < positions.count {
             let completed = SaveManager.shared.data.completedTrials.contains(trial.rawValue)
-            let unlocked: Bool
-
-            if trial.act == 2 {
-                unlocked = SaveManager.shared.data.actTwoUnlocked && (trial.rawValue == 8 || completed || SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1))
-            } else {
-                unlocked = trial.rawValue == 1 || SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1)
-            }
+            // Все уровни открыты сразу для тестирования.
+            let unlocked = true
 
             let node = SKShapeNode(rectOf: CGSize(width: size.width * 0.24, height: 76), cornerRadius: 12)
             node.position = positions[index]
@@ -104,6 +99,15 @@ final class HubScene: SKScene {
         back.position = CGPoint(x: 68, y: 40)
         back.zPosition = 30
         addChild(back)
+
+        let switchButton = SKLabelNode(text: act == 1 ? "АКТ II →" : "← АКТ I")
+        switchButton.fontName = "AvenirNext-Bold"
+        switchButton.fontSize = 18
+        switchButton.fontColor = Palette.blood
+        switchButton.name = "switchAct"
+        switchButton.position = CGPoint(x: size.width - 68, y: 40)
+        switchButton.zPosition = 30
+        addChild(switchButton)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -115,6 +119,14 @@ final class HubScene: SKScene {
                 let menu = MenuScene(size: size)
                 menu.scaleMode = scaleMode
                 view?.presentScene(menu, transition: .fade(withDuration: 0.25))
+                return
+            }
+
+            if current.name == "switchAct" {
+                let nextAct = act == 1 ? 2 : 1
+                let hub = HubScene(size: size, act: nextAct)
+                hub.scaleMode = scaleMode
+                view?.presentScene(hub, transition: .fade(withDuration: 0.25))
                 return
             }
 
@@ -130,20 +142,7 @@ final class HubScene: SKScene {
     }
 
     private func launchIfUnlocked(_ trial: Trial) {
-        let unlocked: Bool
-        if trial.act == 2 {
-            unlocked = SaveManager.shared.data.actTwoUnlocked &&
-                (trial.rawValue == 8 || SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1))
-        } else {
-            unlocked = trial.rawValue == 1 ||
-                SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1)
-        }
-
-        guard unlocked else {
-            Haptics.error()
-            return
-        }
-
+        // Все уровни временно открыты для тестирования.
         let scene: SKScene
         switch trial {
         case .mirror: scene = Trial1_Mirror(size: size)
