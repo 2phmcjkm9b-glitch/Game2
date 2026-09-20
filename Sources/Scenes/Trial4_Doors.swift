@@ -58,7 +58,7 @@ final class Trial4_Doors: SKScene {
             door.strokeColor = Palette.amber.withAlphaComponent(0.7)
             door.lineWidth = 2
             door.glowWidth = 4
-            door.name = "door_(i)"
+            door.name = "door_\\(i)"
 
             let symbol = SKLabelNode(text: symbols[i])
             symbol.fontName = "AvenirNext-Bold"
@@ -81,7 +81,7 @@ final class Trial4_Doors: SKScene {
             return
         }
 
-        roundLabel.text = "Раунд (round) / (maxRounds)"
+        roundLabel.text = "Раунд \\(round) / \\(maxRounds)"
         sequence = (0..<(round + 2)).map { _ in Int.random(in: 0..<4) }
         inputIndex = 0
         accepting = false
