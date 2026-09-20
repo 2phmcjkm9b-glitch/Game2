@@ -41,7 +41,7 @@ final class MenuScene: SKScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let point = touch.location(in: self)
-        guard startButton.contains(point) else { return }
+        guard startButton.calculateAccumulatedFrame().contains(point) else { return }
         startGame()
     }
 }
