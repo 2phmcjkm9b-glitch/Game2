@@ -53,7 +53,7 @@ final class Trial1_Mirror: SKScene {
             rect.fillColor = SKColor(white: 0.10, alpha: 1)
             rect.strokeColor = SKColor(white: 0.35, alpha: 0.6)
             rect.lineWidth = 1
-            rect.name = "tile_(i)"
+            rect.name = "tile_\(i)"
 
             let crack = SKShapeNode()
             let path = CGMutablePath()
@@ -102,14 +102,15 @@ final class Trial1_Mirror: SKScene {
 
         var index: Int?
         for node in nodes(at: point) {
-            if let name = node.name, name.hasPrefix("tile_") {
-                index = Int(name.replacingOccurrences(of: "tile_", with: ""))
-                break
+            var current: SKNode? = node
+            while let candidate = current {
+                if let name = candidate.name, name.hasPrefix("tile_") {
+                    index = Int(name.dropFirst(5))
+                    break
+                }
+                current = candidate.parent
             }
-            if let name = node.parent?.name, name.hasPrefix("tile_") {
-                index = Int(name.replacingOccurrences(of: "tile_", with: ""))
-                break
-            }
+            if index != nil { break }
         }
 
         guard let idx = index, idx >= 0, idx < tiles.count else { return }
