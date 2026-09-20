@@ -86,10 +86,8 @@ final class HubScene: SKScene {
     }
 
     private func isUnlocked(_ trial: Trial) -> Bool {
-        let n = trial.displayNumber
-        if n == 1 { return true }
-        guard let previous = Trial.storyOrder.first(where: { $0.displayNumber == n - 1 }) else { return false }
-        return SaveManager.shared.data.completedTrials.contains(previous.rawValue)
+        // Все уровни доступны сразу. Прохождение и фрагменты пазла сохраняются отдельно.
+        return true
     }
 
     private func addTrialCard(_ trial:Trial, at position:CGPoint, accent:SKColor) {
