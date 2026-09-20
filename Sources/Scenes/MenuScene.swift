@@ -35,7 +35,7 @@ final class MenuScene: SKScene {
         hundred.name = "hundred"
         addChild(hundred)
 
-        let hundredLabel = SKLabelNode(text: "100 ИСПЫТАНИЙ")
+        let hundredLabel = SKLabelNode(text: "6 ИСПЫТАНИЙ")
         hundredLabel.fontName = "AvenirNext-Bold"
         hundredLabel.fontSize = 18
         hundredLabel.fontColor = .white
