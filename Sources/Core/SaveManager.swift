@@ -13,6 +13,7 @@ final class SaveManager {
         var seenIntro: Bool = false
         var actTwoUnlocked: Bool = false
         var signedNotebook: Bool? = nil
+        var puzzlePieces: Set<Int> = []
     }
 
     private(set) var data: Data
@@ -38,6 +39,16 @@ final class SaveManager {
         if let t = time, (data.bestTime[trial] ?? .infinity) > t { data.bestTime[trial] = t }
         recomputeUnlocks()
         save()
+    }
+
+    func collectPuzzlePiece(_ piece: Int) {
+        guard (1...5).contains(piece) else { return }
+        data.puzzlePieces.insert(piece)
+        save()
+    }
+
+    func hasPuzzlePiece(_ piece: Int) -> Bool {
+        data.puzzlePieces.contains(piece)
     }
 
     func setEnding(_ id: Int) { data.ending = id; save() }
