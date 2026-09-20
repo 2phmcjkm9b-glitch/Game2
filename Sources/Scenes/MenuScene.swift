@@ -23,6 +23,7 @@ final class MenuScene: SKScene {
 
         startButton = NeonButton(title: "НАЧАТЬ", size: CGSize(width: 220, height: 58), color: Palette.cyan)
         startButton.name = "startButton"
+        startButton.isUserInteractionEnabled = false
         startButton.position = CGPoint(x: size.width / 2, y: size.height * 0.48)
         addChild(startButton)
 
