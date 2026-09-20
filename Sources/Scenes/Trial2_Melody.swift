@@ -49,7 +49,7 @@ final class Trial2_Melody: SKScene {
             pad.strokeColor = colors[i]
             pad.lineWidth = 2
             pad.glowWidth = 6
-            pad.name = "pad_(i)"
+            pad.name = "pad_\\(i)"
             addChild(pad)
             pads.append(pad)
         }
