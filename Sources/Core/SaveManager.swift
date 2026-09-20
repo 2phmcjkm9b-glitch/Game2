@@ -49,7 +49,7 @@ final class SaveManager {
 
     func reset() { data = Data(); save() }
 
-    var progressActOne: Double { Double(Trial.actOne.filter { data.completedTrials.contains($0.rawValue) }.count) / 7.0 }
-    var progressActTwo: Double { Double(Trial.actTwo.filter { data.completedTrials.contains($0.rawValue) }.count) / 7.0 }
-    var progress: Double { Double(data.completedTrials.count) / 14.0 }
+    var progressActOne: Double { Double(Trial.actOne.filter { data.completedTrials.contains($0.rawValue) }.count) / Double(max(1, Trial.actOne.count)) }
+    var progressActTwo: Double { Double(Trial.actTwo.filter { data.completedTrials.contains($0.rawValue) }.count) / Double(max(1, Trial.actTwo.count)) }
+    var progress: Double { Double(data.completedTrials.count) / Double(max(1, Trial.actOne.count + Trial.actTwo.count + Trial.interludes.count)) }
 }
