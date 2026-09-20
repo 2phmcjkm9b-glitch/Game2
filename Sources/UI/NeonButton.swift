@@ -5,6 +5,7 @@ final class NeonButton: SKNode {
     private let label: SKLabelNode
     private let glowColor: SKColor
     var action: (() -> Void)?
+    private(set) var isEnabled = true
 
     init(title: String, size: CGSize, color: SKColor = Palette.cyan) {
         glowColor = color
@@ -36,6 +37,7 @@ final class NeonButton: SKNode {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func setEnabled(_ on: Bool, dimmedColor: SKColor = Palette.textDim) {
+        isEnabled = on
         bg.strokeColor = on ? glowColor : dimmedColor
         bg.glowWidth = on ? 6 : 0
         label.fontColor = on ? Palette.text : dimmedColor
@@ -43,10 +45,12 @@ final class NeonButton: SKNode {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard isEnabled else { return }
         run(.scale(to: 0.94, duration: 0.08))
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard isEnabled else { return }
         run(.scale(to: 1.0, duration: 0.10))
         Haptics.light()
         Audio.shared.tone(freq: 660, duration: 0.08, volume: 0.15)
