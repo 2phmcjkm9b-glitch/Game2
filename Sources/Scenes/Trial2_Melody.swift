@@ -66,7 +66,13 @@ final class Trial2_Melody: SKScene {
                 Audio.shared.tone(freq: self.freqs[idx], duration: 0.30, volume: 0.22, type: .sine)
                 pad.run(.sequence([.scale(to: 1.08, duration: 0.12), .scale(to: 1.0, duration: 0.12)]))
                 pad.fillColor = pad.strokeColor.withAlphaComponent(0.7)
-                pad.run(.sequence([.wait(forDuration: 0.2), .run { [weak pad] in pad?.fillColor = pad?.strokeColor.withAlphaComponent(0.15) }]))
+                pad.run(.sequence([
+                    .wait(forDuration: 0.2),
+                    .run { [weak pad] in
+                        guard let pad else { return }
+                        pad.fillColor = pad.strokeColor.withAlphaComponent(0.15)
+                    }
+                ]))
             })
             actions.append(.wait(forDuration: 0.45))
         }
