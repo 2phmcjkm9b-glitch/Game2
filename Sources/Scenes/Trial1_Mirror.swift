@@ -15,7 +15,7 @@ final class Trial1_Mirror: SKScene {
         backgroundColor = Palette.bgDeep
         addChild(VignetteNode(size: size, intensity: 0.9))
 
-        let header = SKLabelNode(text: "ЗЕРКАЛО")
+        let header = SKLabelNode(text: "01. ЗЕРКАЛО")
         header.fontName = "AvenirNext-Heavy"
         header.fontSize = 24
         header.fontColor = Palette.cyan
