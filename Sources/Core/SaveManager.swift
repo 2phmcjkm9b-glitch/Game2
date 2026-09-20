@@ -7,6 +7,7 @@ final class SaveManager {
 
     struct Data: Codable {
         var completedTrials: Set<Int> = []
+        var completedHundred: Set<Int> = []
         var bestTime: [Int: Double] = [:]
         var ending: Int? = nil
         var seenIntro: Bool = false
@@ -25,6 +26,11 @@ final class SaveManager {
 
     func save() {
         if let raw = try? JSONEncoder().encode(data) { defaults.set(raw, forKey: key) }
+    }
+
+    func completeHundred(_ level: Int) {
+        data.completedHundred.insert(level)
+        save()
     }
 
     func complete(_ trial: Int, time: Double? = nil) {
