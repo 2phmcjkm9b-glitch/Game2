@@ -5,7 +5,11 @@ final class Trial1_Mirror: SKScene {
     private var oddIndex = 0
     private var timeLeft: Double = 25
     private var timerLabel: SKLabelNode!
+    private var holdLabel: SKLabelNode!
     private var lastTick: TimeInterval = 0
+    private var holdingIndex: Int?
+    private var holdStartTime: TimeInterval = 0
+    private let requiredHold: TimeInterval = 5.0
 
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bgDeep
@@ -24,6 +28,13 @@ final class Trial1_Mirror: SKScene {
         timerLabel.fontColor = Palette.text
         timerLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.86)
         addChild(timerLabel)
+
+        holdLabel = SKLabelNode(text: "НАЙДИ ОТЛИЧАЮЩУЮСЯ И УДЕРЖИВАЙ 5.0 СЕК")
+        holdLabel.fontName = "AvenirNext-Bold"
+        holdLabel.fontSize = 12
+        holdLabel.fontColor = Palette.textDim
+        holdLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.80)
+        addChild(holdLabel)
 
         buildGrid()
         Audio.shared.drone(freq: 60, duration: 3.0, volume: 0.1)
@@ -92,13 +103,22 @@ final class Trial1_Mirror: SKScene {
         timeLeft -= dt
         timerLabel.text = String(format: "%.1f", max(0, timeLeft))
 
+        if let idx = holdingIndex {
+            let held = CACurrentMediaTime() - holdStartTime
+            let remaining = max(0, requiredHold - held)
+            holdLabel.text = String(format: "ДЕРЖИ... %.1f СЕК", remaining)
+            if held < requiredHold {
+                tiles[idx].glowWidth = 5 + CGFloat(held / requiredHold) * 10
+            }
+        }
+
         if timeLeft <= 0 {
             fail()
         }
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let point = touches.first?.location(in: self) else { return }
+        guard holdingIndex == nil, let point = touches.first?.location(in: self) else { return }
 
         var index: Int?
         for node in nodes(at: point) {
@@ -116,24 +136,64 @@ final class Trial1_Mirror: SKScene {
         guard let idx = index, idx >= 0, idx < tiles.count else { return }
 
         if idx == oddIndex {
+            holdingIndex = idx
+            holdStartTime = CACurrentMediaTime()
+            holdLabel.text = "ДЕРЖИ... 5.0 СЕК"
+            holdLabel.fontColor = Palette.cyan
             tiles[idx].strokeColor = Palette.cyan
-            tiles[idx].glowWidth = 10
-            FX.flash(on: self, color: Palette.cyan, duration: 0.25)
-            GameFlow.completeAndReturn(self, trial: .mirror)
+            tiles[idx].glowWidth = 5
         } else {
-            timeLeft -= 3
-            Haptics.error()
-            Audio.shared.tone(freq: 160, duration: 0.2, volume: 0.25, type: .square)
-            FX.shake(camera ?? self, intensity: 10, duration: 0.3)
-            tiles[idx].run(.sequence([
-                .run { [weak self] in self?.tiles[idx].strokeColor = Palette.blood },
-                .wait(forDuration: 0.4),
-                .run { [weak self] in self?.tiles[idx].strokeColor = SKColor(white: 0.35, alpha: 0.6) }
-            ]))
+            handleWrongTap(idx)
         }
     }
 
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let idx = holdingIndex else { return }
+        holdingIndex = nil
+
+        let heldFor = CACurrentMediaTime() - holdStartTime
+        if idx == oddIndex && heldFor >= requiredHold {
+            tiles[idx].strokeColor = Palette.cyan
+            tiles[idx].glowWidth = 10
+            holdLabel.text = "ПРАВИЛЬНО!"
+            FX.flash(on: self, color: Palette.cyan, duration: 0.25)
+            GameFlow.completeAndReturn(self, trial: .mirror)
+        } else {
+            holdLabel.text = "СЛИШКОМ РАНО — ОТВЕТ НЕВЕРНЫЙ"
+            holdLabel.fontColor = Palette.blood
+            handleWrongTap(idx)
+        }
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let idx = holdingIndex else { return }
+        holdingIndex = nil
+        holdLabel.text = "ОТПУСТИЛ — ОТВЕТ НЕВЕРНЫЙ"
+        holdLabel.fontColor = Palette.blood
+        handleWrongTap(idx)
+    }
+
+    private func handleWrongTap(_ idx: Int) {
+        timeLeft -= 3
+        Haptics.error()
+        Audio.shared.tone(freq: 160, duration: 0.2, volume: 0.25, type: .square)
+        FX.shake(camera ?? self, intensity: 10, duration: 0.3)
+        tiles[idx].run(.sequence([
+            .run { [weak self] in self?.tiles[idx].strokeColor = Palette.blood },
+            .wait(forDuration: 0.4),
+            .run { [weak self] in
+                guard let self else { return }
+                self.tiles[idx].strokeColor = SKColor(white: 0.35, alpha: 0.6)
+                if self.holdingIndex == nil {
+                    self.holdLabel.text = "НАЙДИ ОТЛИЧАЮЩУЮСЯ И УДЕРЖИВАЙ 5.0 СЕК"
+                    self.holdLabel.fontColor = Palette.textDim
+                }
+            }
+        ]))
+    }
+
     private func fail() {
+        holdingIndex = nil
         FX.flash(on: self, color: Palette.blood, duration: 0.5)
         Haptics.error()
         run(.sequence([
