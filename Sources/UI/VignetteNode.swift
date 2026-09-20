@@ -5,7 +5,8 @@ final class VignetteNode: SKSpriteNode {
         let tex = VignetteTexture.make(size: size, intensity: intensity)
         super.init(texture: tex, color: .clear, size: size)
         position = CGPoint(x: size.width / 2, y: size.height / 2)
-        zPosition = 9000
+        // Decorative overlay must stay below interactive UI nodes.
+        zPosition = 1
         isUserInteractionEnabled = false
     }
 
