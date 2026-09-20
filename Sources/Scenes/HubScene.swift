@@ -4,6 +4,18 @@ final class HubScene: SKScene {
     private let trials: [Trial] = Trial.allCases
     private var didHandleTouch = false
 
+    private var highestUnlockedTrial: Int {
+        var unlocked = 1
+        for trial in trials.dropFirst() {
+            if SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1) {
+                unlocked = trial.rawValue
+            } else {
+                break
+            }
+        }
+        return unlocked
+    }
+
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
         buildUI()
@@ -18,7 +30,7 @@ final class HubScene: SKScene {
         title.zPosition = 10
         addChild(title)
 
-        let progress = SKLabelNode(text: "7 испытаний — все доступны")
+        let progress = SKLabelNode(text: "Открыто: \(highestUnlockedTrial) из 7")
         progress.fontName = "AvenirNext-Regular"
         progress.fontSize = 12
         progress.fontColor = Palette.textDim
@@ -38,7 +50,7 @@ final class HubScene: SKScene {
             let col = index % cols
             let x = col == 0 ? size.width / 2 - cardW / 2 - gapX / 2 : size.width / 2 + cardW / 2 + gapX / 2
             let y = startY - CGFloat(row) * gapY
-            let card = makeCard(trial: trial, width: cardW, height: cardH)
+            let card = makeCard(trial: trial, width: cardW, height: cardH, unlocked: trial.rawValue <= highestUnlockedTrial)
             card.position = CGPoint(x: x, y: y)
             card.name = "trial_\(trial.rawValue)"
             addChild(card)
@@ -50,21 +62,22 @@ final class HubScene: SKScene {
         addChild(back)
     }
 
-    private func makeCard(trial: Trial, width: CGFloat, height: CGFloat) -> SKNode {
+    private func makeCard(trial: Trial, width: CGFloat, height: CGFloat, unlocked: Bool) -> SKNode {
         let node = SKNode()
         node.zPosition = 5
         let card = SKShapeNode(rectOf: CGSize(width: width, height: height), cornerRadius: 12)
         card.fillColor = SKColor(white: 0.055, alpha: 1)
-        card.strokeColor = color(for: trial)
+        card.strokeColor = unlocked ? color(for: trial) : SKColor(white: 0.22, alpha: 1)
         card.lineWidth = 2
-        card.glowWidth = 3
+        card.glowWidth = unlocked ? 3 : 0
+        card.alpha = unlocked ? 1 : 0.55
         card.name = "card"
         node.addChild(card)
 
         let number = SKLabelNode(text: "\(trial.rawValue)")
         number.fontName = "AvenirNext-Heavy"
         number.fontSize = 22
-        number.fontColor = color(for: trial)
+        number.fontColor = unlocked ? color(for: trial) : Palette.textDim
         number.position = CGPoint(x: -width / 2 + 28, y: 8)
         number.verticalAlignmentMode = .center
         node.addChild(number)
@@ -85,10 +98,10 @@ final class HubScene: SKScene {
         subtitle.position = CGPoint(x: -width / 2 + 52, y: -7)
         node.addChild(subtitle)
 
-        let arrow = SKLabelNode(text: "›")
+        let arrow = SKLabelNode(text: unlocked ? "›" : "🔒")
         arrow.fontName = "AvenirNext-Bold"
         arrow.fontSize = 26
-        arrow.fontColor = color(for: trial)
+        arrow.fontColor = unlocked ? color(for: trial) : Palette.textDim
         arrow.position = CGPoint(x: width / 2 - 18, y: 0)
         arrow.verticalAlignmentMode = .center
         node.addChild(arrow)
@@ -135,6 +148,10 @@ final class HubScene: SKScene {
                     return
                 }
                 if let name = candidate.name, name.hasPrefix("trial_"), let raw = Int(name.dropFirst(6)), let trial = Trial(rawValue: raw) {
+                    guard raw <= highestUnlockedTrial else {
+                        Haptics.error()
+                        return
+                    }
                     launch(trial)
                     return
                 }
