@@ -68,6 +68,19 @@ final class MenuScene: SKScene {
 
         FX.pulse(panel, scale: 1.025, duration: 1.5)
 
+        let hundred = NeonButton(title: "100 ИСПЫТАНИЙ",
+                                  size: CGSize(width: size.width * 0.65, height: 52),
+                                  color: Palette.blood)
+        hundred.position = CGPoint(x: size.width / 2, y: size.height * 0.25)
+        hundred.name = "hundredButton"
+        hundred.action = { [weak self] in
+            guard let self else { return }
+            let s = HundredLevelsScene(size: self.size)
+            s.scaleMode = self.scaleMode
+            self.view?.presentScene(s, transition: .fade(withDuration: 0.5))
+        }
+        addChild(hundred)
+
         let footer = SKLabelNode(text: "СИСТЕМА НАБЛЮДЕНИЯ • OFFLINE")
         footer.fontName = "AvenirNext-Medium"
         footer.fontSize = 9
@@ -92,6 +105,18 @@ final class MenuScene: SKScene {
             let hub = HubScene(size: size, act: 1)
             hub.scaleMode = scaleMode
             view?.presentScene(hub, transition: .fade(withDuration: 0.3))
+            return
+        }
+
+        var current: SKNode? = atPoint(point)
+        while let node = current {
+            if node.name == "hundredButton" {
+                let s = HundredLevelsScene(size: size)
+                s.scaleMode = scaleMode
+                view?.presentScene(s, transition: .fade(withDuration: 0.5))
+                return
+            }
+            current = node.parent
         }
     }
 }
