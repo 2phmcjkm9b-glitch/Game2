@@ -24,7 +24,7 @@ final class HundredLevelsScene: SKScene {
             let card=SKShapeNode(rectOf:CGSize(width:size.width*0.40,height:58),cornerRadius:12)
             card.position=CGPoint(x:x,y:y); card.fillColor=Palette.panel
             card.strokeColor=level.id == 97 ? Palette.magenta : Palette.cyanSoft
-            card.lineWidth=1.5; card.name="level_(level.id)"; card.zPosition=10
+            card.lineWidth=1.5; card.name="level_\(level.id)"; card.zPosition=10
             let num=SKLabelNode(text:String(format:"%02d",level.id))
             num.fontName="AvenirNext-Heavy"; num.fontSize=18; num.fontColor=Palette.blood
             num.horizontalAlignmentMode = .left; num.verticalAlignmentMode = .center
