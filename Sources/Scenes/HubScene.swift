@@ -7,6 +7,8 @@ final class HubScene: SKScene {
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
         buildUI()
+        Audio.shared.start()
+        Audio.shared.drone(freq: 48, duration: 2.5, volume: 0.08)
     }
 
     private func buildUI() {
@@ -14,7 +16,7 @@ final class HubScene: SKScene {
         title.fontName = "AvenirNext-Heavy"
         title.fontSize = 25
         title.fontColor = Palette.text
-        title.position = CGPoint(x: size.width / 2, y: size.height * 0.93)
+        title.position = CGPoint(x: size.width / 2, y: size.height * 0.86)
         title.zPosition = 10
         addChild(title)
 
@@ -22,7 +24,7 @@ final class HubScene: SKScene {
         progress.fontName = "AvenirNext-Regular"
         progress.fontSize = 12
         progress.fontColor = Palette.textDim
-        progress.position = CGPoint(x: size.width / 2, y: size.height * 0.885)
+        progress.position = CGPoint(x: size.width / 2, y: size.height * 0.82)
         progress.zPosition = 10
         addChild(progress)
 
@@ -30,17 +32,14 @@ final class HubScene: SKScene {
         let cardW = size.width * 0.42
         let cardH = min(92.0, size.height * 0.115)
         let gapX = size.width * 0.045
-        let startY = size.height * 0.77
+        let startY = size.height * 0.70
         let gapY = cardH + 14
 
         for (index, trial) in trials.enumerated() {
             let row = index / cols
             let col = index % cols
-            let x = col == 0
-                ? size.width / 2 - cardW / 2 - gapX / 2
-                : size.width / 2 + cardW / 2 + gapX / 2
+            let x = col == 0 ? size.width / 2 - cardW / 2 - gapX / 2 : size.width / 2 + cardW / 2 + gapX / 2
             let y = startY - CGFloat(row) * gapY
-
             let card = makeCard(trial: trial, width: cardW, height: cardH)
             card.position = CGPoint(x: x, y: y)
             card.name = "trial_\(trial.rawValue)"
@@ -56,7 +55,6 @@ final class HubScene: SKScene {
     private func makeCard(trial: Trial, width: CGFloat, height: CGFloat) -> SKNode {
         let node = SKNode()
         node.zPosition = 5
-
         let card = SKShapeNode(rectOf: CGSize(width: width, height: height), cornerRadius: 12)
         card.fillColor = SKColor(white: 0.055, alpha: 1)
         card.strokeColor = color(for: trial)
@@ -71,7 +69,6 @@ final class HubScene: SKScene {
         number.fontColor = color(for: trial)
         number.position = CGPoint(x: -width / 2 + 28, y: 8)
         number.verticalAlignmentMode = .center
-        number.name = "number"
         node.addChild(number)
 
         let title = SKLabelNode(text: trial.title)
@@ -80,7 +77,6 @@ final class HubScene: SKScene {
         title.fontColor = Palette.text
         title.horizontalAlignmentMode = .left
         title.position = CGPoint(x: -width / 2 + 52, y: 14)
-        title.name = "title"
         node.addChild(title)
 
         let subtitle = SKLabelNode(text: trial.subtitle)
@@ -89,7 +85,6 @@ final class HubScene: SKScene {
         subtitle.fontColor = Palette.textDim
         subtitle.horizontalAlignmentMode = .left
         subtitle.position = CGPoint(x: -width / 2 + 52, y: -7)
-        subtitle.name = "subtitle"
         node.addChild(subtitle)
 
         let arrow = SKLabelNode(text: "›")
@@ -99,7 +94,6 @@ final class HubScene: SKScene {
         arrow.position = CGPoint(x: width / 2 - 18, y: 0)
         arrow.verticalAlignmentMode = .center
         node.addChild(arrow)
-
         return node
     }
 
@@ -108,7 +102,6 @@ final class HubScene: SKScene {
         button.fillColor = SKColor(white: 0.06, alpha: 1)
         button.strokeColor = Palette.textDim
         button.lineWidth = 1.5
-
         let label = SKLabelNode(text: title)
         label.fontName = "AvenirNext-Bold"
         label.fontSize = 13
@@ -134,7 +127,6 @@ final class HubScene: SKScene {
         guard !didHandleTouch, let point = touches.first?.location(in: self) else { return }
         didHandleTouch = true
         defer { didHandleTouch = false }
-
         for node in nodes(at: point) {
             var current: SKNode? = node
             while let candidate = current {
@@ -144,14 +136,10 @@ final class HubScene: SKScene {
                     view?.presentScene(menu, transition: .fade(withDuration: 0.25))
                     return
                 }
-
-                if let name = candidate.name, name.hasPrefix("trial_"),
-                   let raw = Int(name.dropFirst(6)),
-                   let trial = Trial(rawValue: raw) {
+                if let name = candidate.name, name.hasPrefix("trial_"), let raw = Int(name.dropFirst(6)), let trial = Trial(rawValue: raw) {
                     launch(trial)
                     return
                 }
-
                 current = candidate.parent
             }
         }
