@@ -32,7 +32,7 @@ enum FX {
             p.strokeColor = .clear
             p.position = CGPoint(x: .random(in: 0...scene.size.width),
                                  y: .random(in: 0...scene.size.height))
-            p.zPosition = 2
+            p.zPosition = -1
             let dur = TimeInterval.random(in: 6...14)
             p.run(.repeatForever(.sequence([
                 .group([
@@ -124,7 +124,7 @@ enum FX {
         line.fillColor = color.withAlphaComponent(0.08)
         line.strokeColor = .clear
         line.position = CGPoint(x: scene.size.width / 2, y: scene.size.height + 5)
-        line.zPosition = 50
+        line.zPosition = -2
         scene.addChild(line)
         line.run(.repeatForever(.sequence([
             .moveTo(y: -5, duration: 5.5),
