@@ -293,7 +293,6 @@ class ActTwoTrialBase: SKScene {
                         } else {
                             wordProgress = ""
                             usedLetters.removeAll()
-                            self.childNode(withName: "//letter_")?.removeAllActions()
                             letterNode.text = "ОШИБКА • начни заново"
                             failPulse(n)
                             self.enumerateChildNodes(withName: "//letter_*") { node, _ in node.alpha = 1.0 }
