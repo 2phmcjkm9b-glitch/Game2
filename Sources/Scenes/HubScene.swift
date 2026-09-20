@@ -30,7 +30,7 @@ final class HubScene: SKScene {
         title.zPosition = 10
         addChild(title)
 
-        let progress = SKLabelNode(text: "Открыто: \(highestUnlockedTrial) из 7")
+        let progress = SKLabelNode(text: "Открыто: \(highestUnlockedTrial) из 14")
         progress.fontName = "AvenirNext-Regular"
         progress.fontSize = 12
         progress.fontColor = Palette.textDim
@@ -170,6 +170,8 @@ final class HubScene: SKScene {
         case .dontLookAway: scene = Trial5_DontLookAway(size: size)
         case .notes: scene = Trial6_Notes(size: size)
         case .finalChoice: scene = Trial7_FinalChoice(size: size)
+        case .whisper, .classroom, .clock, .shadow, .locker, .footsteps, .lastBell:
+            scene = ExtraTrialScene(size: size, trial: trial)
         }
         scene.scaleMode = scaleMode
         view?.presentScene(scene, transition: .fade(withDuration: 0.3))
