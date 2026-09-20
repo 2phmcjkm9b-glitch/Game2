@@ -152,7 +152,7 @@ final class HundredTrialScene: SKScene {
     private func buildWord() {
         let words=["ШКОЛА","ТЕНЬ","ЭХО","ЗЕРКАЛО","ПОДВАЛ","МЕЛОДИЯ","ПАМЯТЬ","ТИШИНА"]
         let word=words[(level.id-1)%words.count]
-        sequence=word.map{Int($0.asciiValue ?? 65)}
+        sequence=word.utf8.map{Int($0)}
         let letters=Array(word).shuffled()
         for (i,ch) in letters.enumerated() {
             _=makeCell(String(ch),"w_\(Int(ch.asciiValue ?? 65))_\(i)",size.width/2+CGFloat(i-letters.count/2)*58,size.height*0.45)
