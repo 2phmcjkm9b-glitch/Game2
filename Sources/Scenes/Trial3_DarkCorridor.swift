@@ -29,6 +29,9 @@ final class Trial3_DarkCorridor: SKScene {
         addChild(hint)
 
         buildCorridor()
+        Audio.shared.start()
+        Audio.shared.drone(freq: 36, duration: 2.5, volume: 0.10)
+        addBackButton()
     }
 
     private func buildCorridor() {
@@ -107,8 +110,16 @@ final class Trial3_DarkCorridor: SKScene {
         addChild(ring)
     }
 
+    private func addBackButton() {
+        let b = SKShapeNode(rectOf: CGSize(width: 120, height: 42), cornerRadius: 10); b.position = CGPoint(x: 70, y: 35); b.fillColor = SKColor(white: 0.06, alpha: 1); b.strokeColor = Palette.textDim; b.name = "backButton"
+        let l = SKLabelNode(text: "← НАЗАД"); l.fontName = "AvenirNext-Bold"; l.fontSize = 13; l.fontColor = Palette.text; l.verticalAlignmentMode = .center; b.addChild(l); addChild(b)
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard !finished, let touch = touches.first else { return }
+        guard let touch = touches.first else { return }
+        let p0 = touch.location(in: self)
+        if p0.y < 80 && p0.x < 150 { let hub = HubScene(size: size); hub.scaleMode = scaleMode; view?.presentScene(hub, transition: .fade(withDuration: 0.25)); return }
+        guard !finished else { return }
         if !started {
             started = true
             startTime = CACurrentMediaTime()
