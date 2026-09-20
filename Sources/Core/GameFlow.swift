@@ -65,7 +65,7 @@ enum GameFlow {
             let w: CGFloat = 68
             let h: CGFloat = 68
             let x = CGFloat(col - 1) * 74
-            let y = row == 0 ? 38 : -42
+            let y: CGFloat = row == 0 ? 38 : -42
             let pieceNode = SKShapeNode(rectOf: CGSize(width: w, height: h), cornerRadius: 8)
             pieceNode.position = CGPoint(x: x, y: y)
             pieceNode.fillColor = i <= piece ? Palette.cyanSoft : SKColor(white: 0.05, alpha: 1)
