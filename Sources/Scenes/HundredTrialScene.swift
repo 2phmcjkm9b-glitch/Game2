@@ -2,6 +2,7 @@ import SpriteKit
 
 final class HundredTrialScene: SKScene {
     private let level: Level
+    private let mainTrial: Trial?
 
     private var target = 0
     private var sequence: [Int] = []
@@ -13,8 +14,9 @@ final class HundredTrialScene: SKScene {
     private var lights: [Bool] = []
     private var choiceRule = ""
 
-    init(size: CGSize, level: Level) {
+    init(size: CGSize, level: Level, mainTrial: Trial? = nil) {
         self.level = level
+        self.mainTrial = mainTrial
         super.init(size: size)
     }
 
@@ -208,9 +210,7 @@ final class HundredTrialScene: SKScene {
     private func buildSequence(reverse: Bool) {
         let len = min(10, max(3, Int(level.params["len"] ?? Double(3 + level.difficulty / 2))))
         sequence = (0..<len).map { _ in Int.random(in: 0..<4) }
-        if reverse {
-            sequence.reverse()
-        }
+        let displayedSequence = sequence
 
         let symbols = ["◆", "●", "▲", "■"]
         for i in 0..<4 {
@@ -220,7 +220,7 @@ final class HundredTrialScene: SKScene {
 
         setStatus(reverse ? "СМОТРИ — ПОТОМ НАОБОРОТ" : "СМОТРИ...")
         var actions: [SKAction] = []
-        for (i, value) in sequence.enumerated() {
+        for (i, value) in displayedSequence.enumerated() {
             actions.append(.wait(forDuration: 0.18))
             actions.append(.run { [weak self] in
                 guard let self else { return }
@@ -593,7 +593,11 @@ final class HundredTrialScene: SKScene {
         guard !solved else { return }
         if ok {
             solved = true
-            SaveManager.shared.completeHundred(level.id)
+            if let mainTrial {
+                SaveManager.shared.complete(mainTrial.rawValue)
+            } else {
+                SaveManager.shared.completeHundred(level.id)
+            }
             Haptics.success()
             Audio.shared.tone(freq: 720, duration: 0.2, volume: 0.22)
             setStatus("ИСПЫТАНИЕ ПРОЙДЕНО")
@@ -617,8 +621,14 @@ final class HundredTrialScene: SKScene {
     }
 
     private func backToMap() {
-        let map = HundredLevelsScene(size: size)
-        map.scaleMode = scaleMode
-        view?.presentScene(map, transition: .fade(withDuration: 0.25))
+        if mainTrial != nil {
+            let map = HubScene(size: size, act: 2)
+            map.scaleMode = scaleMode
+            view?.presentScene(map, transition: .fade(withDuration: 0.25))
+        } else {
+            let map = HundredLevelsScene(size: size)
+            map.scaleMode = scaleMode
+            view?.presentScene(map, transition: .fade(withDuration: 0.25))
+        }
     }
 }
