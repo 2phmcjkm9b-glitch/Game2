@@ -29,6 +29,11 @@ final class SaveManager {
         }
     }
 
+    func setEnding(_ ending: Int) {
+        data.ending = ending
+        save()
+    }
+
     func complete(_ trial: Int, time: Double? = nil) {
         data.completedTrials.insert(trial)
         if let t = time, (data.bestTime[trial] ?? .infinity) > t {
