@@ -155,7 +155,7 @@ class ActTwoTrialBase: SKScene {
 
     private func buildWhispers() {
         let target = "ШКОЛАТРИНАДЦАТЬСКРЫВАЕТСВОЮТАЙНУНАВСЕГДА"
-        let letters = Array(target)
+        var letters = Array(target)
         while letters.count < 40 { letters.append(["А","О","Е","И","Т","Р","Н","С"].randomElement()!) }
         letters.shuffle()
 
