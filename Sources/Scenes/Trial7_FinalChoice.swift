@@ -87,6 +87,7 @@ final class Trial7_FinalChoice: SKScene {
     private func finish(_ ending: Int) {
         finished = true
         SaveManager.shared.setEnding(ending)
+        UserDefaults.standard.set(ending, forKey: "school13.firstChoice")
         SaveManager.shared.complete(7)
 
         let result = SKLabelNode(text: ending == 1 ? "Ты остался." : "Ты ушёл.")
