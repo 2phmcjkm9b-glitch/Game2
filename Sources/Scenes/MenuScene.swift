@@ -26,28 +26,11 @@ final class MenuScene: SKScene {
         startLabel.verticalAlignmentMode = .center
         startLabel.name = "start"
         start.addChild(startLabel)
-
-        let hundred = SKShapeNode(rectOf: CGSize(width: 240, height: 52), cornerRadius: 12)
-        hundred.position = CGPoint(x: size.width / 2, y: size.height * 0.32)
-        hundred.fillColor = SKColor(white: 0.08, alpha: 1)
-        hundred.strokeColor = SKColor(red: 0.9, green: 0.1, blue: 0.18, alpha: 1)
-        hundred.lineWidth = 2
-        hundred.name = "hundred"
-        addChild(hundred)
-
-        let hundredLabel = SKLabelNode(text: "6 ИСПЫТАНИЙ")
-        hundredLabel.fontName = "AvenirNext-Bold"
-        hundredLabel.fontSize = 18
-        hundredLabel.fontColor = .white
-        hundredLabel.verticalAlignmentMode = .center
-        hundredLabel.name = "hundred"
-        hundred.addChild(hundredLabel)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
         var node: SKNode? = atPoint(point)
-
         while let current = node {
             if current.name == "start" {
                 let hub = HubScene(size: size, act: 1)
@@ -55,14 +38,6 @@ final class MenuScene: SKScene {
                 view?.presentScene(hub, transition: .fade(withDuration: 0.3))
                 return
             }
-
-            if current.name == "hundred" {
-                let scene = HundredLevelsScene(size: size)
-                scene.scaleMode = scaleMode
-                view?.presentScene(scene, transition: .fade(withDuration: 0.3))
-                return
-            }
-
             node = current.parent
         }
     }
