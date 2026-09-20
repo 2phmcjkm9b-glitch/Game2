@@ -58,23 +58,23 @@ final class HubScene: SKScene {
     private func addTrialCard(_ trial:Trial,at position:CGPoint,accent:SKColor) {
         let completed=SaveManager.shared.data.completedTrials.contains(trial.rawValue)
         let node=SKShapeNode(rectOf:CGSize(width:size.width*0.19,height:62),cornerRadius:12)
-        node.position=position; node.name="level_(trial.rawValue)"; node.fillColor=Palette.panel
+        node.position=position; node.name="level_\(trial.rawValue)"; node.fillColor=Palette.panel
         node.strokeColor=completed ? Palette.amber : accent; node.lineWidth=completed ? 2.5 : 1.3; node.glowWidth=completed ? 7 : 3; node.zPosition=5
         let number=SKLabelNode(text:String(format:"%02d",trial.rawValue))
         number.fontName="AvenirNext-Heavy"; number.fontSize=21; number.fontColor=Palette.text; number.position=CGPoint(x:0,y:9)
-        number.verticalAlignmentMode=.center; number.name=node.name; node.addChild(number)
+        number.verticalAlignmentMode = .center; number.name=node.name; node.addChild(number)
         let label=SKLabelNode(text:trial.title.uppercased())
         label.fontName="AvenirNext-Bold"; label.fontSize=7.5; label.fontColor=Palette.textDim; label.position=CGPoint(x:0,y:-16)
-        label.verticalAlignmentMode=.center; label.name=node.name; node.addChild(label)
+        label.verticalAlignmentMode = .center; label.name=node.name; node.addChild(label)
         addChild(node); FX.cardGlow(node,color:completed ? Palette.amber : accent,radius:completed ? 7 : 4); levelNodes.append(node)
     }
 
     private func addSpecialCard(_ trial:Trial,at position:CGPoint) {
         let node=SKShapeNode(rectOf:CGSize(width:size.width*0.30,height:42),cornerRadius:10)
-        node.position=position; node.name="level_(trial.rawValue)"; node.fillColor=Palette.panel; node.strokeColor=Palette.amber
+        node.position=position; node.name="level_\(trial.rawValue)"; node.fillColor=Palette.panel; node.strokeColor=Palette.amber
         node.lineWidth=1.4; node.zPosition=10
-        let label=SKLabelNode(text:"(String(format:"%02d",trial.rawValue)) • (trial.title.uppercased())")
-        label.fontName="AvenirNext-Bold"; label.fontSize=9; label.fontColor=Palette.amber; label.verticalAlignmentMode=.center
+        let label=SKLabelNode(text:"\(String(format: "%02d", trial.rawValue)) • \(trial.title.uppercased())")
+        label.fontName="AvenirNext-Bold"; label.fontSize=9; label.fontColor=Palette.amber; label.verticalAlignmentMode = .center
         label.name=node.name; node.addChild(label); addChild(node)
     }
 
@@ -100,15 +100,23 @@ final class HubScene: SKScene {
     private func launch(_ trial:Trial) {
         let scene:SKScene
         switch trial {
+        case .melody: scene=Trial2_Melody(size:size)
+        case .dontLookAway: scene=Trial5_DontLookAway(size:size)
+        case .notes: scene=Trial6_Notes(size:size)
+        case .finalChoice: scene=Trial7_FinalChoice(size:size)
         case .mirror: scene=Trial1_Mirror(size:size)
         case .darkCorridor: scene=Trial3_DarkCorridor(size:size)
         case .doors: scene=Trial4_Doors(size:size)
         case .mirrorHall: scene=Trial8_MirrorHall(size:size)
+        case .candles: scene=Trial9_Candles(size:size)
         case .whispers: scene=Trial10_Whispers(size:size)
         case .shadows: scene=Trial11_Shadows(size:size)
+        case .clock: scene=Trial12_Clock(size:size)
         case .rhyme: scene=Trial13_Rhyme(size:size)
         case .lastDesk: scene=Trial14_LastDesk(size:size)
+        case .director: scene=Trial15_Director(size:size)
         case .stairs: scene=Trial16_Stairs(size:size)
+        case .classZero: scene=Trial18_ClassZero(size:size)
         case .schoolBell: scene=Trial20_SchoolBell(size:size)
         case .lastDoor: scene=Trial21_LastDoor(size:size)
         case .archiveMemory,.archiveMirror,.archiveWord,.archiveChoice,.archiveBranch,.archiveCount:
