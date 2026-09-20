@@ -208,8 +208,9 @@ final class HundredTrialScene: SKScene {
     private func buildSequence(reverse: Bool) {
         let len = min(10, max(3, Int(level.params["len"] ?? Double(3 + level.difficulty / 2))))
         sequence = (0..<len).map { _ in Int.random(in: 0..<4) }
-        let shown = reverse ? sequence.reversed() : sequence[...]
-        sequence = Array(shown)
+        if reverse {
+            sequence.reverse()
+        }
 
         let symbols = ["◆", "●", "▲", "■"]
         for i in 0..<4 {
