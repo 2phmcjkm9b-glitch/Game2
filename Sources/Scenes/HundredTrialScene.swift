@@ -625,7 +625,7 @@ final class HundredTrialScene: SKScene {
 
     private func backToMap() {
         if mainTrial != nil {
-            let map = HubScene(size: size, act: 2)
+            let map = HubScene(size: size, act: mainTrial?.act ?? 1)
             map.scaleMode = scaleMode
             view?.presentScene(map, transition: .fade(withDuration: 0.25))
         } else {
