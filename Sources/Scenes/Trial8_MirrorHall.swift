@@ -23,7 +23,7 @@ class ActTwoTrialBase: SKScene {
         Audio.shared.start()
         Audio.shared.drone(freq: 38, duration: 2.0, volume: 0.11)
 
-        let title = SKLabelNode(text: "(trial.rawValue). (trial.title.uppercased())")
+        let title = SKLabelNode(text: "\(trial.rawValue). \(trial.title.uppercased())")
         title.fontName = "AvenirNext-Heavy"
         title.fontSize = 23
         title.fontColor = Palette.blood
@@ -98,7 +98,7 @@ class ActTwoTrialBase: SKScene {
             m.position = CGPoint(x: CGFloat(c - 1) * size.width * 0.25, y: r == 0 ? 45 : -45)
             m.fillColor = SKColor(white: 0.08, alpha: 1)
             m.strokeColor = Palette.cyan.withAlphaComponent(0.7)
-            m.name = "mirror_(i)"
+            m.name = "mirror_\(i)"
             let line = SKShapeNode()
             let p = CGMutablePath()
             p.move(to: CGPoint(x: -25, y: 25))
@@ -124,7 +124,7 @@ class ActTwoTrialBase: SKScene {
             candle.position = CGPoint(x: CGFloat(c - 1) * size.width * 0.25, y: r == 0 ? 45 : -45)
             candle.fillColor = Palette.amber.withAlphaComponent(0.8)
             candle.strokeColor = Palette.amber
-            candle.name = "candle_(i)"
+            candle.name = "candle_\(i)"
             let flame = SKShapeNode(circleOfRadius: 11)
             flame.position = CGPoint(x: 0, y: 55)
             flame.fillColor = Palette.blood
@@ -145,10 +145,10 @@ class ActTwoTrialBase: SKScene {
             let b = SKShapeNode(rectOf: CGSize(width: 58, height: 58), cornerRadius: 10)
             let c = i % 4
             let r = i / 4
-            b.position = CGPoint(x: CGFloat(c - 1.5) * 68, y: r == 0 ? 42 : -42)
+            b.position = CGPoint(x: (CGFloat(c) - 1.5) * 68, y: r == 0 ? 42 : -42)
             b.fillColor = SKColor(white: 0.08, alpha: 1)
             b.strokeColor = Palette.magenta
-            b.name = "letter_(i)_(letters[i])"
+            b.name = "letter_\(i)_\(letters[i])"
             let l = SKLabelNode(text: letters[i]); l.fontName = "AvenirNext-Heavy"; l.fontSize = 22
             l.fontColor = Palette.text; l.verticalAlignmentMode = .center; b.addChild(l)
             box.addChild(b)
@@ -169,7 +169,7 @@ class ActTwoTrialBase: SKScene {
             s.position = CGPoint(x: CGFloat(c - 1.5) * 68, y: r == 0 ? 42 : -42)
             s.fillColor = SKColor(white: 0.01, alpha: 1)
             s.strokeColor = Palette.blood.withAlphaComponent(0.6)
-            s.name = "shadow_(i)"
+            s.name = "shadow_\(i)"
             if i == targetIndex {
                 s.xScale = 1.25
                 s.yScale = 0.75
@@ -211,7 +211,7 @@ class ActTwoTrialBase: SKScene {
             b.position = CGPoint(x: i % 2 == 0 ? -82 : 82, y: i < 2 ? 5 : -55)
             b.fillColor = SKColor(white: 0.07, alpha: 1)
             b.strokeColor = Palette.cyan.withAlphaComponent(0.7)
-            b.name = "rhyme_(i)"
+            b.name = "rhyme_\(i)"
             let l = SKLabelNode(text: answers[i]); l.fontName = "AvenirNext-Bold"; l.fontSize = 14; l.fontColor = Palette.text; l.verticalAlignmentMode = .center
             b.addChild(l); box.addChild(b)
         }
