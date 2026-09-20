@@ -166,7 +166,7 @@ class ActTwoTrialBase: SKScene {
             let c = i % 4
             let r = i / 4
             let s = SKShapeNode(ellipseOf: CGSize(width: 72, height: 54))
-            s.position = CGPoint(x: CGFloat(c - 1.5) * 68, y: r == 0 ? 42 : -42)
+            s.position = CGPoint(x: (CGFloat(c) - 1.5) * 68, y: r == 0 ? 42 : -42)
             s.fillColor = SKColor(white: 0.01, alpha: 1)
             s.strokeColor = Palette.blood.withAlphaComponent(0.6)
             s.name = "shadow_\(i)"
