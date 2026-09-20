@@ -43,13 +43,6 @@ final class HubScene: SKScene {
         for (index,trial) in trials.enumerated() where index < positions.count {
             addTrialCard(trial,at:positions[index],accent:act == 1 ? Palette.cyan : Palette.blood)
         }
-        if act == 1 {
-            let bridge = SKLabelNode(text:"МЕЖДУ АКТАМИ")
-            bridge.fontName="AvenirNext-Bold"; bridge.fontSize=9; bridge.fontColor=Palette.amber
-            bridge.position=CGPoint(x:size.width/2,y:size.height*0.205); bridge.zPosition=20; addChild(bridge)
-            addSpecialCard(.lastDesk,at:CGPoint(x:size.width*0.31,y:size.height*0.12))
-            addSpecialCard(.lastDoor,at:CGPoint(x:size.width*0.69,y:size.height*0.12))
-        }
         let progress = SKLabelNode(text:act == 1 ? "(trials.count) ОСНОВНЫХ • 2 ПЕРЕХОДА" : "(trials.count) ОСНОВНЫХ • ВСЕ ДОСТУПНЫ")
         progress.fontName="AvenirNext-Medium"; progress.fontSize=9; progress.fontColor=Palette.textFaint
         progress.position=CGPoint(x:size.width/2,y:12); progress.zPosition=20; addChild(progress)
