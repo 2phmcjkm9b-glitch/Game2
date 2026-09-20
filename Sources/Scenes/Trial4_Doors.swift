@@ -39,6 +39,9 @@ final class Trial4_Doors: SKScene {
 
         buildDoors()
         nextRound()
+        Audio.shared.start()
+        Audio.shared.drone(freq: 44, duration: 2.0, volume: 0.08)
+        addBackButton()
     }
 
     private func buildDoors() {
@@ -101,8 +104,16 @@ final class Trial4_Doors: SKScene {
         ]), withKey: "hint")
     }
 
+    private func addBackButton() {
+        let b = SKShapeNode(rectOf: CGSize(width: 120, height: 42), cornerRadius: 10); b.position = CGPoint(x: 70, y: 35); b.fillColor = SKColor(white: 0.06, alpha: 1); b.strokeColor = Palette.textDim; b.name = "backButton"
+        let l = SKLabelNode(text: "← НАЗАД"); l.fontName = "AvenirNext-Bold"; l.fontSize = 13; l.fontColor = Palette.text; l.verticalAlignmentMode = .center; b.addChild(l); addChild(b)
+    }
+    private func goBack() { let hub = HubScene(size: size); hub.scaleMode = scaleMode; view?.presentScene(hub, transition: .fade(withDuration: 0.25)) }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard !finished, accepting, let point = touches.first?.location(in: self) else { return }
+        guard let point = touches.first?.location(in: self) else { return }
+        if point.y < 80 && point.x < 150 { goBack(); return }
+        guard !finished, accepting else { return }
 
         var index: Int?
         for node in nodes(at: point) {
