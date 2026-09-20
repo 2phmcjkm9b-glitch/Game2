@@ -16,7 +16,7 @@ final class Audio {
         started = true
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .game, options: [.mixWithOthers])
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try session.setActive(true)
         } catch {
             // Sound is non-fatal: the game must continue if audio is unavailable.
@@ -69,7 +69,11 @@ final class Audio {
                 wave = Double.random(in: -1.0...1.0)
             }
 
-            let sample = Int16(max(-1.0, min(1.0, wave * safeVolume * max(0.0, envelope))) * 32767.0)
+            let shaped = wave * safeVolume
+            let faded = shaped * max(0.0, envelope)
+            let clipped = max(-1.0, min(1.0, faded))
+            let sampleValue = clipped * 32767.0
+            let sample = Int16(sampleValue)
             appendLE16(to: &wav, UInt16(bitPattern: sample))
         }
 
