@@ -30,7 +30,7 @@ final class HubScene: SKScene {
     }
 
     private func buildHeader() {
-        let tag = SKLabelNode(text: "ШКОЛА 13 • (actTitle())")
+        let tag = SKLabelNode(text: "ШКОЛА 13 • \(actTitle())")
         tag.fontName="AvenirNext-Bold"; tag.fontSize=10; tag.fontColor=act % 2 == 0 ? Palette.blood : Palette.cyan
         tag.position=CGPoint(x:size.width/2,y:size.height*0.88); tag.zPosition=20; addChild(tag)
 
@@ -39,7 +39,7 @@ final class HubScene: SKScene {
         title.fontName="AvenirNext-Heavy"; title.fontSize=26; title.fontColor=Palette.text
         title.position=CGPoint(x:size.width/2,y:size.height*0.79); title.zPosition=20; addChild(title)
 
-        let subtitle = SKLabelNode(text: "АКТ (act) • (act == 5 ? "ФИНАЛ" : "ПРОХОЖДЕНИЕ")")
+        let subtitle = SKLabelNode(text: "АКТ \(act) • \(act == 5 ? "ФИНАЛ" : "ПРОХОЖДЕНИЕ")")
         subtitle.fontName="AvenirNext-Medium"; subtitle.fontSize=11; subtitle.fontColor=Palette.textDim
         subtitle.position=CGPoint(x:size.width/2,y:size.height*0.745); subtitle.zPosition=20; addChild(subtitle)
 
@@ -48,7 +48,7 @@ final class HubScene: SKScene {
 
     private func buildPuzzleProgress() {
         let collected = SaveManager.shared.data.puzzlePieces.count
-        let label = SKLabelNode(text: "ПАЗЛ: (collected)/5 ФРАГМЕНТОВ")
+        let label = SKLabelNode(text: "ПАЗЛ: \(collected)/5 ФРАГМЕНТОВ")
         label.fontName="AvenirNext-Bold"; label.fontSize=10; label.fontColor=Palette.amber
         label.position=CGPoint(x:size.width/2,y:size.height*0.70); label.zPosition=20; addChild(label)
 
@@ -78,8 +78,8 @@ final class HubScene: SKScene {
 
         let piece = [1:1,2:2,3:3,4:4,5:5][act]!
         let rewardText = SaveManager.shared.hasPuzzlePiece(piece)
-            ? "ФРАГМЕНТ ПАЗЛА (piece)/5 ПОЛУЧЕН"
-            : "ФРАГМЕНТ ПАЗЛА (piece)/5 — ЗА ФИНАЛ АКТА"
+            ? "ФРАГМЕНТ ПАЗЛА \(piece)/5 ПОЛУЧЕН"
+            : "ФРАГМЕНТ ПАЗЛА \(piece)/5 — ЗА ФИНАЛ АКТА"
         let progress = SKLabelNode(text: rewardText)
         progress.fontName="AvenirNext-Medium"; progress.fontSize=9; progress.fontColor=Palette.textFaint
         progress.position=CGPoint(x:size.width/2,y:12); progress.zPosition=20; addChild(progress)
@@ -116,12 +116,12 @@ final class HubScene: SKScene {
         back.name="back"; back.position=CGPoint(x:58,y:34); back.zPosition=30; addChild(back)
 
         if act > 1 {
-            let prev=SKLabelNode(text:"← АКТ (act-1)")
+            let prev=SKLabelNode(text:"← АКТ \(act-1)")
             prev.fontName="AvenirNext-Bold"; prev.fontSize=14; prev.fontColor=Palette.cyan
             prev.name="prevAct"; prev.position=CGPoint(x:size.width-98,y:34); prev.zPosition=30; addChild(prev)
         }
         if act < 5 {
-            let next=SKLabelNode(text:"АКТ (act+1) →")
+            let next=SKLabelNode(text:"АКТ \(act+1) →")
             next.fontName="AvenirNext-Bold"; next.fontSize=14; next.fontColor=Palette.blood
             next.name="nextAct"; next.position=CGPoint(x:size.width-70,y:34); next.zPosition=30; addChild(next)
         }
