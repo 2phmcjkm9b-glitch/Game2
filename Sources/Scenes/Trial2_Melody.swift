@@ -25,6 +25,7 @@ final class Trial2_Melody: SKScene {
         hint.position = CGPoint(x: size.width / 2, y: size.height * 0.83); addChild(hint)
 
         buildPads()
+        addBackButton()
         nextRound()
     }
 
@@ -74,7 +75,9 @@ final class Trial2_Melody: SKScene {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard !finished, acceptingInput, let point = touches.first?.location(in: self) else { return }
+        guard let point = touches.first?.location(in: self) else { return }
+        if point.y < 80 && point.x < 150 { goBack(); return }
+        guard !finished, acceptingInput else { return }
         var index: Int?
         for node in nodes(at: point) {
             var current: SKNode? = node
@@ -108,6 +111,13 @@ final class Trial2_Melody: SKScene {
         finished = true; Audio.shared.tone(freq: 660, duration: 0.4, volume: 0.18)
         FX.flash(on: self, color: Palette.magenta, duration: 0.3)
         GameFlow.completeAndReturn(self, trial: .melody)
+    }
+
+    private func addBackButton() {
+        let b = SKShapeNode(rectOf: CGSize(width: 120, height: 42), cornerRadius: 10)
+        b.position = CGPoint(x: 70, y: 35); b.fillColor = SKColor(white: 0.06, alpha: 1); b.strokeColor = Palette.textDim; b.name = "backButton"
+        let l = SKLabelNode(text: "← НАЗАД"); l.fontName = "AvenirNext-Bold"; l.fontSize = 13; l.fontColor = Palette.text; l.verticalAlignmentMode = .center
+        b.addChild(l); addChild(b)
     }
 
     private func goBack() {
