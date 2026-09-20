@@ -18,9 +18,7 @@ final class Audio {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try session.setActive(true)
-        } catch {
-            // Sound is non-fatal: the game must continue if audio is unavailable.
-        }
+        } catch {}
     }
 
     func tone(
@@ -32,7 +30,8 @@ final class Audio {
         start()
 
         let sampleRate = 44_100.0
-        let count = max(1, Int(sampleRate * max(0.03, duration)))
+        let safeDuration = max(0.03, duration)
+        let count = max(1, Int(sampleRate * safeDuration))
         let channels = 1
         let bytesPerSample = 2
         let dataSize = count * channels * bytesPerSample
@@ -54,26 +53,32 @@ final class Audio {
 
         let safeFreq = max(20.0, min(freq, sampleRate / 2.0 - 100.0))
         let safeVolume = max(0.0, min(volume, 1.0))
+        let twoPi = 2.0 * Double.pi
+        let fadeIn = 0.015
+        let fadeOut = 0.04
 
         for i in 0..<count {
             let t = Double(i) / sampleRate
-            let envelope = min(1.0, t / 0.015) * min(1.0, (duration - t) / 0.04)
-            let wave: Double
+            let remaining = safeDuration - t
+            let attack = min(1.0, t / fadeIn)
+            let release = min(1.0, remaining / fadeOut)
+            let envelope = max(0.0, min(1.0, attack * release))
 
+            let wave: Double
             switch type {
             case .sine:
-                wave = sin(2.0 * .pi * safeFreq * t)
+                wave = sin(twoPi * safeFreq * t)
             case .square:
-                wave = sin(2.0 * .pi * safeFreq * t) >= 0 ? 1.0 : -1.0
+                wave = sin(twoPi * safeFreq * t) >= 0.0 ? 1.0 : -1.0
             case .noise:
                 wave = Double.random(in: -1.0...1.0)
             }
 
-            let shaped = wave * safeVolume
-            let faded = shaped * max(0.0, envelope)
-            let clipped = max(-1.0, min(1.0, faded))
-            let sampleValue = clipped * 32767.0
-            let sample = Int16(sampleValue)
+            let shaped: Double = wave * Double(safeVolume)
+            let faded: Double = shaped * envelope
+            let clipped: Double = max(-1.0, min(1.0, faded))
+            let sampleValue: Double = clipped * 32767.0
+            let sample: Int16 = Int16(sampleValue)
             appendLE16(to: &wav, UInt16(bitPattern: sample))
         }
 
@@ -87,9 +92,7 @@ final class Audio {
             players.removeAll { !$0.isPlaying }
             players.append(player)
             lock.unlock()
-        } catch {
-            // Never let an audio failure crash gameplay.
-        }
+        } catch {}
     }
 
     func drone(freq: Double = 55, duration: Double = 2, volume: Float = 0.12) {
