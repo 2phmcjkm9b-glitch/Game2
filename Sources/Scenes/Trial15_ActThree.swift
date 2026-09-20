@@ -55,7 +55,7 @@ class ActThreeTrialBase: SKScene {
     }
 
     private func buildCode() {
-        let b=box("Код: 1 • 3 • 1 • 3")
+        let b=box("Код скрыт в кабинете. Найди 4 числа.")
         let digits=[1,2,3,4]
         for i in 0..<4 { button(b,"\(digits[i])","code_\(digits[i])",CGFloat(i-1)*70,10) }
         let l=SKLabelNode(text:"Введено: "); l.name="status"; l.fontName="AvenirNext-Bold"; l.fontSize=16; l.fontColor=Palette.cyan; l.position=CGPoint(x:0,y:-75); b.addChild(l)
@@ -68,8 +68,34 @@ class ActThreeTrialBase: SKScene {
         for r in 0..<4 { for c in 0..<3 {
             let n=button(b,"\(c+1)","step_\(r)_\(c)",CGFloat(c-1)*88,CGFloat(75-r*48))
             n.strokeColor = Palette.textDim
+            n.alpha = 0.55
         }}
-        let l=SKLabelNode(text:"4 ряда • выбирай по одному"); l.fontName="AvenirNext-Bold"; l.fontSize=13; l.fontColor=Palette.textDim; l.position=CGPoint(x:0,y:-120); b.addChild(l)
+        let l=SKLabelNode(text:"Смотри: безопасные ступени подсветятся"); l.name="status"; l.fontName="AvenirNext-Bold"; l.fontSize=13; l.fontColor=Palette.cyan; l.position=CGPoint(x:0,y:-120); b.addChild(l)
+        run(.sequence([
+            .wait(forDuration:0.5),
+            .run { [weak self] in
+                guard let self else { return }
+                for r in 0..<4 {
+                    let c=self.sequence[r]
+                    if let n=self.childNode(withName:"//step_\(r)_\(c)") as? SKShapeNode {
+                        n.run(.sequence([
+                            .fadeAlpha(to:1,duration:0.12),
+                            .scale(to:1.08,duration:0.12),
+                            .wait(forDuration:0.45),
+                            .scale(to:1,duration:0.10),
+                            .fadeAlpha(to:0.55,duration:0.10)
+                        ]))
+                    }
+                    if r < 3 {
+                        self.run(.wait(forDuration:0.58))
+                    }
+                }
+            },
+            .wait(forDuration:2.9),
+            .run { [weak self] in
+                (self?.childNode(withName:"//status") as? SKLabelNode)?.text="Теперь выбери 4 ступени"
+            }
+        ]))
     }
 
     private func buildBell() {
@@ -85,7 +111,7 @@ class ActThreeTrialBase: SKScene {
             return .sequence([
                 .run { [weak self] in
                     guard let self else { return }
-                    if let n=self.childNode(withName:"//bell_\\(i)") { n.run(.sequence([.group([.fadeAlpha(to:1,duration:0.08),.scale(to:1.16,duration:0.08)]),.wait(forDuration:0.20),.group([.fadeAlpha(to:0.48,duration:0.10),.scale(to:1,duration:0.10)])])) }
+                    if let n=self.childNode(withName:"//bell_\(i)") { n.run(.sequence([.group([.fadeAlpha(to:1,duration:0.08),.scale(to:1.16,duration:0.08)]),.wait(forDuration:0.20),.group([.fadeAlpha(to:0.48,duration:0.10),.scale(to:1,duration:0.10)])])) }
                     Audio.shared.tone(freq:[180.0,240.0,320.0][i],duration:0.22,volume:0.22)
                 },
                 .wait(forDuration:0.34)
@@ -99,9 +125,13 @@ class ActThreeTrialBase: SKScene {
 
     private func buildClassZero() {
         let b=box("В кабинете 0 есть одна лишняя вещь")
-        target=Int.random(in:0..<8)
+        target=7
         let items=["ПАРТА","СТУЛ","КНИГА","ЛАМПА","ЧАСЫ","МЕЛ","КАРТА","КУКЛА"]
-        for i in 0..<8 { let n=button(b,items[i],"item_\(i)",CGFloat(i%4-1)*82, i<4 ? 45 : -35); if i==target { n.alpha=0.98 } }
+        for i in 0..<8 {
+            let n=button(b,items[i],"item_\(i)",CGFloat(i%4-1)*82, i<4 ? 45 : -35)
+            n.strokeColor = i == target ? Palette.magenta : Palette.textDim
+        }
+        let clue=SKLabelNode(text:"Один предмет не принадлежит классу"); clue.fontName="AvenirNext-Regular"; clue.fontSize=12; clue.fontColor=Palette.textDim; clue.position=CGPoint(x:0,y:-120); b.addChild(clue)
     }
 
     private func buildNotebook() {
@@ -131,10 +161,34 @@ class ActThreeTrialBase: SKScene {
     }
 
     private func buildSchoolBell() {
-        let b=box("Останови секундную стрелку на 13:13")
+        let b=box("Останови часы ровно на 13:13")
         let clock=SKLabelNode(text:"13:10"); clock.name="clock"; clock.fontName="AvenirNext-Heavy"; clock.fontSize=46; clock.fontColor=Palette.text; clock.position=CGPoint(x:0,y:25); b.addChild(clock)
         let stop=button(b,"ОСТАНОВИТЬ","stopClock",0,-60)
-        run(.repeatForever(.sequence([.wait(forDuration:0.55),.run { [weak self,weak clock] in guard let self,let clock else{return}; let vals=["13:11","13:12","13:13","13:14"]; let idx = self.changed ? 3 : Int.random(in:0..<4); clock.text=vals[idx] } ])))
+        let vals=["13:10","13:11","13:12","13:13","13:14","13:15"]
+        run(.sequence([
+            .wait(forDuration:0.45),
+            .run { [weak self,weak clock] in
+                guard let self,let clock else{return}
+                self.changed=true
+                let tick=Int(clock.userData?["tick"] as? Int ?? 0)
+                let next=min(tick+1, vals.count-1)
+                if clock.userData == nil { clock.userData = NSMutableDictionary() }
+                clock.userData?["tick"]=next
+                clock.text=vals[next]
+            },
+            .repeatForever(.sequence([
+                .wait(forDuration:0.65),
+                .run { [weak self,weak clock] in
+                    guard let self,let clock else{return}
+                    let tick=Int(clock.userData?["tick"] as? Int ?? 0)
+                    let next=(tick+1) % vals.count
+                    if clock.userData == nil { clock.userData = NSMutableDictionary() }
+                    clock.userData?["tick"]=next
+                    clock.text=vals[next]
+                    self.changed=true
+                }
+            ]))
+        ]))
         stop.name="stopClock"
     }
 
