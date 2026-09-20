@@ -8,7 +8,7 @@ enum GameFlow {
         scene.run(.sequence([
             .wait(forDuration: delay),
             .run {
-                let hub = HubScene(size: scene.size, act: trial.act)
+                let hub = HubScene(size: scene.size, act: trial == .lastDesk ? 2 : trial.act)
                 hub.scaleMode = scene.scaleMode
                 scene.view?.presentScene(hub, transition: .fade(withDuration: 0.5))
             }
