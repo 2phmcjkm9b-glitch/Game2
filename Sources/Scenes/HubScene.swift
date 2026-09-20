@@ -16,7 +16,7 @@ final class HubScene: SKScene {
         title.fontName = "AvenirNext-Heavy"
         title.fontSize = 25
         title.fontColor = Palette.text
-        title.position = CGPoint(x: size.width / 2, y: size.height * 0.86)
+        title.position = CGPoint(x: size.width / 2, y: size.height * 0.77)
         title.zPosition = 10
         addChild(title)
 
@@ -24,7 +24,7 @@ final class HubScene: SKScene {
         progress.fontName = "AvenirNext-Regular"
         progress.fontSize = 12
         progress.fontColor = Palette.textDim
-        progress.position = CGPoint(x: size.width / 2, y: size.height * 0.82)
+        progress.position = CGPoint(x: size.width / 2, y: size.height * 0.73)
         progress.zPosition = 10
         addChild(progress)
 
