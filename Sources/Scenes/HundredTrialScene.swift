@@ -393,7 +393,7 @@ final class HundredTrialScene: SKScene {
     }
 
     private func buildCount() {
-        let amount = min(18, max(4, Int(level.params["objects"] ?? 6)))
+        let amount = min(24, max(4, Int(level.params["objects"] ?? 6)))
         target = amount
 
         for i in 0..<amount {
