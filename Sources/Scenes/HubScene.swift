@@ -7,8 +7,6 @@ final class HubScene: SKScene {
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
         buildUI()
-        Audio.shared.start()
-        Audio.shared.drone(freq: 48, duration: 2.5, volume: 0.08)
     }
 
     private func buildUI() {
