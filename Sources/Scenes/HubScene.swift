@@ -60,7 +60,7 @@ final class HubScene: SKScene {
         let node=SKShapeNode(rectOf:CGSize(width:size.width*0.19,height:62),cornerRadius:12)
         node.position=position; node.name="level_\(trial.rawValue)"; node.fillColor=Palette.panel
         node.strokeColor=completed ? Palette.amber : accent; node.lineWidth=completed ? 2.5 : 1.3; node.glowWidth=completed ? 7 : 3; node.zPosition=5
-        let number=SKLabelNode(text:String(format:"%02d",trial.rawValue))
+        let number=SKLabelNode(text:String(format:"%02d",trial.displayNumber))
         number.fontName="AvenirNext-Heavy"; number.fontSize=21; number.fontColor=Palette.text; number.position=CGPoint(x:0,y:9)
         number.verticalAlignmentMode = .center; number.name=node.name; node.addChild(number)
         let label=SKLabelNode(text:trial.title.uppercased())
