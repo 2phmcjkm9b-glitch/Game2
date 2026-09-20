@@ -100,7 +100,7 @@ class ActTwoTrialBase: SKScene {
             let col = i % 4
             let row = i / 4
             let m = SKShapeNode(rectOf: CGSize(width: size.width * 0.16, height: 58), cornerRadius: 9)
-            m.position = CGPoint(x: CGFloat(col - 1.5) * size.width * 0.205, y: 92 - CGFloat(row) * 68)
+            m.position = CGPoint(x: CGFloat(col) - 1.5 * size.width * 0.205, y: 92 - CGFloat(row) * 68)
             m.fillColor = SKColor(white: 0.08, alpha: 1)
             m.strokeColor = Palette.cyan.withAlphaComponent(0.65)
             m.name = "mirror_\\(i)"
