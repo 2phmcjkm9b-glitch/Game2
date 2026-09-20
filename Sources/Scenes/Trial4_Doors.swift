@@ -16,7 +16,7 @@ final class Trial4_Doors: SKScene {
         backgroundColor = Palette.bgDeep
         addChild(VignetteNode(size: size, intensity: 0.9))
 
-        let header = SKLabelNode(text: "03. ДВЕРИ")
+        let header = SKLabelNode(text: "04. ДВЕРИ")
         header.fontName = "AvenirNext-Heavy"
         header.fontSize = 24
         header.fontColor = Palette.amber
@@ -113,7 +113,7 @@ final class Trial4_Doors: SKScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
         if point.y < 80 && point.x < 150 { goBack(); return }
-        guard !finished, accepting else { return }
+        guard !finished else { return }
 
         var index: Int?
         for node in nodes(at: point) {
@@ -128,9 +128,27 @@ final class Trial4_Doors: SKScene {
             if index != nil { break }
         }
 
-        guard let idx = index, idx >= 0, idx < doors.count, inputIndex < sequence.count else { return }
+        guard let idx = index, idx >= 0, idx < doors.count else { return }
 
         let door = doors[idx]
+
+        // Every door gives immediate visual/haptic feedback when tapped.
+        // During the memory preview it does not change the answer state.
+        if !accepting {
+            door.run(.sequence([
+                .scale(to: 0.94, duration: 0.07),
+                .scale(to: 1.0, duration: 0.07)
+            ]))
+            door.strokeColor = Palette.text
+            Audio.shared.tone(freq: 180 + Double(idx) * 55, duration: 0.08, volume: 0.10)
+            run(.sequence([
+                .wait(forDuration: 0.12),
+                .run { [weak door] in door?.strokeColor = Palette.amber.withAlphaComponent(0.7) }
+            ]))
+            return
+        }
+
+        guard inputIndex < sequence.count else { return }
         door.run(.sequence([
             .scale(to: 0.96, duration: 0.08),
             .scale(to: 1.0, duration: 0.08)
