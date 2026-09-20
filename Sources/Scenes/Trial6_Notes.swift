@@ -72,8 +72,7 @@ final class Trial6_Notes: SKScene {
         for node in nodes(at: point) {
             var current: SKNode? = node
             while let candidate = current {
-                if let name = candidate.name, name.hasPrefix("note_"),
-                   _ = Int(name.dropFirst(5)) {
+                if let name = candidate.name, name.hasPrefix("note_") {
                     if candidate.alpha > 0.5 {
                         candidate.alpha = 0.35
                         if let text = candidate.children.compactMap({ $0 as? SKLabelNode }).first {
