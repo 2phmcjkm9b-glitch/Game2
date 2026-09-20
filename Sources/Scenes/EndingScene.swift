@@ -41,7 +41,7 @@ final class EndingScene: SKScene {
         again.strokeColor = Palette.cyan
         again.name = "again"
 
-        let label = SKLabelNode(text: "В МЕНЮ")
+        let label = SKLabelNode(text: "← НАЗАД")
         label.fontName = "AvenirNext-Bold"
         label.fontSize = 15
         label.fontColor = Palette.text
