@@ -2,115 +2,68 @@ import SpriteKit
 
 final class MenuScene: SKScene {
     override func didMove(to view: SKView) {
-        removeAllChildren()
-        backgroundColor = Palette.bgDeep
-
-        let top = SKLabelNode(text: "АРХИВ • 13")
-        top.fontName = "AvenirNext-Bold"
-        top.fontSize = 12
-        top.fontColor = Palette.textDim
-        top.position = CGPoint(x: size.width / 2, y: size.height * 0.84)
-        top.zPosition = 20
-        addChild(top)
+        backgroundColor = .black
 
         let title = SKLabelNode(text: "ШКОЛА №13")
-        title.fontName = "AvenirNext-Heavy"
-        title.fontSize = 46
-        title.fontColor = Palette.text
+        title.fontName = "AvenirNext-Bold"
+        title.fontSize = 34
+        title.fontColor = .white
         title.position = CGPoint(x: size.width / 2, y: size.height * 0.68)
-        title.zPosition = 20
         addChild(title)
 
-        let line = SKShapeNode(rectOf: CGSize(width: 155, height: 1))
-        line.position = CGPoint(x: size.width / 2, y: size.height * 0.635)
-        line.fillColor = Palette.magenta
-        line.strokeColor = .clear
-        line.alpha = 0.8
-        addChild(line)
+        let start = SKShapeNode(rectOf: CGSize(width: 240, height: 60), cornerRadius: 12)
+        start.position = CGPoint(x: size.width / 2, y: size.height * 0.48)
+        start.fillColor = SKColor(white: 0.08, alpha: 1)
+        start.strokeColor = .white
+        start.lineWidth = 2
+        start.name = "start"
+        addChild(start)
 
-        let subtitle = SKLabelNode(text: "НЕ ВСЕ ДВЕРИ ВЕДУТ НАРУЖУ")
-        subtitle.fontName = "AvenirNext-Medium"
-        subtitle.fontSize = 13
-        subtitle.fontColor = Palette.textDim
-        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.59)
-        subtitle.zPosition = 20
-        addChild(subtitle)
+        let startLabel = SKLabelNode(text: "НАЧАТЬ")
+        startLabel.fontName = "AvenirNext-Bold"
+        startLabel.fontSize = 22
+        startLabel.fontColor = .white
+        startLabel.verticalAlignmentMode = .center
+        startLabel.name = "start"
+        start.addChild(startLabel)
 
-        let panel = SKShapeNode(rectOf: CGSize(width: 230, height: 82), cornerRadius: 18)
-        panel.position = CGPoint(x: size.width / 2, y: size.height * 0.43)
-        panel.fillColor = Palette.panel
-        panel.strokeColor = Palette.magenta
-        panel.lineWidth = 1.5
-        panel.glowWidth = 9
-        panel.name = "startButton"
-        panel.zPosition = 10
-        addChild(panel)
-
-        let start = SKLabelNode(text: "НАЧАТЬ")
-        start.fontName = "AvenirNext-Heavy"
-        start.fontSize = 25
-        start.fontColor = Palette.text
-        start.verticalAlignmentMode = .center
-        start.name = "startButton"
-        panel.addChild(start)
-
-        let hint = SKLabelNode(text: "ВХОД В ШКОЛУ")
-        hint.fontName = "AvenirNext-Medium"
-        hint.fontSize = 9
-        hint.fontColor = Palette.magenta
-        hint.position = CGPoint(x: 0, y: -27)
-        hint.name = "startButton"
-        panel.addChild(hint)
-
-
-        let hundred = NeonButton(title: "100 ИСПЫТАНИЙ",
-                                  size: CGSize(width: size.width * 0.65, height: 52),
-                                  color: Palette.blood)
-        hundred.position = CGPoint(x: size.width / 2, y: size.height * 0.25)
-        hundred.name = "hundredButton"
-        hundred.action = { [weak self] in
-            guard let self else { return }
-            let s = HundredLevelsScene(size: self.size)
-            s.scaleMode = self.scaleMode
-            self.view?.presentScene(s, transition: .fade(withDuration: 0.5))
-        }
+        let hundred = SKShapeNode(rectOf: CGSize(width: 240, height: 52), cornerRadius: 12)
+        hundred.position = CGPoint(x: size.width / 2, y: size.height * 0.32)
+        hundred.fillColor = SKColor(white: 0.08, alpha: 1)
+        hundred.strokeColor = SKColor(red: 0.9, green: 0.1, blue: 0.18, alpha: 1)
+        hundred.lineWidth = 2
+        hundred.name = "hundred"
         addChild(hundred)
 
-        let footer = SKLabelNode(text: "СИСТЕМА НАБЛЮДЕНИЯ • OFFLINE")
-        footer.fontName = "AvenirNext-Medium"
-        footer.fontSize = 9
-        footer.fontColor = Palette.textFaint
-        footer.position = CGPoint(x: size.width / 2, y: 28)
-        addChild(footer)
-
+        let hundredLabel = SKLabelNode(text: "100 ИСПЫТАНИЙ")
+        hundredLabel.fontName = "AvenirNext-Bold"
+        hundredLabel.fontSize = 18
+        hundredLabel.fontColor = .white
+        hundredLabel.verticalAlignmentMode = .center
+        hundredLabel.name = "hundred"
+        hundred.addChild(hundredLabel)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
-        let hit = nodes(at: point).contains { node in
-            var current: SKNode? = node
-            while let candidate = current {
-                if candidate.name == "startButton" { return true }
-                current = candidate.parent
-            }
-            return false
-        }
-        if hit {
-            let hub = HubScene(size: size, act: 1)
-            hub.scaleMode = scaleMode
-            view?.presentScene(hub, transition: .fade(withDuration: 0.3))
-            return
-        }
+        var node: SKNode? = atPoint(point)
 
-        var current: SKNode? = atPoint(point)
-        while let node = current {
-            if node.name == "hundredButton" {
-                let s = HundredLevelsScene(size: size)
-                s.scaleMode = scaleMode
-                view?.presentScene(s, transition: .fade(withDuration: 0.5))
+        while let current = node {
+            if current.name == "start" {
+                let hub = HubScene(size: size, act: 1)
+                hub.scaleMode = scaleMode
+                view?.presentScene(hub, transition: .fade(withDuration: 0.3))
                 return
             }
-            current = node.parent
+
+            if current.name == "hundred" {
+                let scene = HundredLevelsScene(size: size)
+                scene.scaleMode = scaleMode
+                view?.presentScene(scene, transition: .fade(withDuration: 0.3))
+                return
+            }
+
+            node = current.parent
         }
     }
 }
