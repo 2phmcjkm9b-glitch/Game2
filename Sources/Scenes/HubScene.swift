@@ -2,6 +2,7 @@ import SpriteKit
 
 final class HubScene: SKScene {
     private var act: Int = 1
+    private var levelNodes: [SKNode] = []
 
     init(size: CGSize, act: Int = 1) {
         super.init(size: size)
@@ -14,45 +15,154 @@ final class HubScene: SKScene {
     }
 
     override func didMove(to view: SKView) {
+        removeAllChildren()
         backgroundColor = Palette.bg
+        buildHeader()
+        buildLevels()
+        buildBackButton()
+    }
 
+    private func buildHeader() {
         let title = SKLabelNode(text: act == 1 ? "КАРТА ШКОЛЫ" : "ПОДВАЛ")
         title.fontName = "AvenirNext-Bold"
         title.fontSize = 24
-        title.fontColor = .white
+        title.fontColor = act == 1 ? Palette.text : Palette.blood
         title.position = CGPoint(x: size.width / 2, y: size.height * 0.82)
+        title.zPosition = 20
         addChild(title)
 
-        let info = SKLabelNode(text: "Выбери уровень")
-        info.fontName = "AvenirNext-Medium"
-        info.fontSize = 18
-        info.fontColor = Palette.textDim
-        info.position = CGPoint(x: size.width / 2, y: size.height * 0.74)
-        addChild(info)
+        let subtitle = SKLabelNode(text: act == 1 ? "АКТ I • выбери доступный уровень" : "АКТ II • выбери доступный уровень")
+        subtitle.fontName = "AvenirNext-Medium"
+        subtitle.fontSize = 15
+        subtitle.fontColor = Palette.textDim
+        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.77)
+        subtitle.zPosition = 20
+        addChild(subtitle)
+    }
 
+    private func buildLevels() {
+        levelNodes.removeAll()
+
+        let trials = act == 1 ? Trial.actOne : Trial.actTwo
+        let positions: [CGPoint] = [
+            CGPoint(x: size.width * 0.22, y: size.height * 0.64),
+            CGPoint(x: size.width * 0.50, y: size.height * 0.64),
+            CGPoint(x: size.width * 0.78, y: size.height * 0.64),
+            CGPoint(x: size.width * 0.22, y: size.height * 0.47),
+            CGPoint(x: size.width * 0.50, y: size.height * 0.47),
+            CGPoint(x: size.width * 0.78, y: size.height * 0.47),
+            CGPoint(x: size.width * 0.50, y: size.height * 0.30)
+        ]
+
+        for (index, trial) in trials.enumerated() where index < positions.count {
+            let completed = SaveManager.shared.data.completedTrials.contains(trial.rawValue)
+            let unlocked: Bool
+
+            if trial.act == 2 {
+                unlocked = SaveManager.shared.data.actTwoUnlocked && (trial.rawValue == 8 || completed || SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1))
+            } else {
+                unlocked = trial.rawValue == 1 || SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1)
+            }
+
+            let node = SKShapeNode(rectOf: CGSize(width: size.width * 0.24, height: 76), cornerRadius: 12)
+            node.position = positions[index]
+            node.name = "level_\(trial.rawValue)"
+            node.fillColor = SKColor(white: 0.07, alpha: 1)
+            node.strokeColor = unlocked ? (completed ? Palette.amber : Palette.cyan) : Palette.textDim
+            node.lineWidth = 2
+            node.zPosition = 5
+
+            let number = SKLabelNode(text: "\(trial.rawValue)")
+            number.fontName = "AvenirNext-Heavy"
+            number.fontSize = 25
+            number.fontColor = unlocked ? Palette.text : Palette.textDim
+            number.position = CGPoint(x: 0, y: 12)
+            number.verticalAlignmentMode = .center
+            number.name = node.name
+            node.addChild(number)
+
+            let label = SKLabelNode(text: unlocked ? trial.title : "ЗАКРЫТО")
+            label.fontName = "AvenirNext-Bold"
+            label.fontSize = 10
+            label.fontColor = unlocked ? Palette.text : Palette.textDim
+            label.position = CGPoint(x: 0, y: -18)
+            label.verticalAlignmentMode = .center
+            label.name = node.name
+            node.addChild(label)
+
+            addChild(node)
+            levelNodes.append(node)
+        }
+    }
+
+    private func buildBackButton() {
         let back = SKLabelNode(text: "← НАЗАД")
         back.fontName = "AvenirNext-Bold"
         back.fontSize = 20
-        back.fontColor = .white
+        back.fontColor = Palette.text
         back.name = "back"
-        back.position = CGPoint(x: 70, y: 42)
+        back.position = CGPoint(x: 68, y: 40)
+        back.zPosition = 30
         addChild(back)
-
-        let first = SKLabelNode(text: act == 1 ? "УРОВЕНЬ 1" : "УРОВЕНЬ 8")
-        first.fontName = "AvenirNext-Bold"
-        first.fontSize = 28
-        first.fontColor = Palette.cyan
-        first.name = "testLevel"
-        first.position = CGPoint(x: size.width / 2, y: size.height * 0.58)
-        addChild(first)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
-        if nodes(at: point).contains(where: { $0.name == "back" }) {
-            let menu = MenuScene(size: size)
-            menu.scaleMode = scaleMode
-            view?.presentScene(menu)
+
+        var node: SKNode? = atPoint(point)
+        while let current = node {
+            if current.name == "back" {
+                let menu = MenuScene(size: size)
+                menu.scaleMode = scaleMode
+                view?.presentScene(menu, transition: .fade(withDuration: 0.25))
+                return
+            }
+
+            if let name = current.name, name.hasPrefix("level_"),
+               let raw = Int(name.dropFirst(6)),
+               let trial = Trial(rawValue: raw) {
+                launchIfUnlocked(trial)
+                return
+            }
+
+            node = current.parent
         }
+    }
+
+    private func launchIfUnlocked(_ trial: Trial) {
+        let unlocked: Bool
+        if trial.act == 2 {
+            unlocked = SaveManager.shared.data.actTwoUnlocked &&
+                (trial.rawValue == 8 || SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1))
+        } else {
+            unlocked = trial.rawValue == 1 ||
+                SaveManager.shared.data.completedTrials.contains(trial.rawValue - 1)
+        }
+
+        guard unlocked else {
+            Haptics.error()
+            return
+        }
+
+        let scene: SKScene
+        switch trial {
+        case .mirror: scene = Trial1_Mirror(size: size)
+        case .melody: scene = Trial2_Melody(size: size)
+        case .darkCorridor: scene = Trial3_DarkCorridor(size: size)
+        case .doors: scene = Trial4_Doors(size: size)
+        case .dontLookAway: scene = Trial5_DontLookAway(size: size)
+        case .notes: scene = Trial6_Notes(size: size)
+        case .finalChoice: scene = Trial7_FinalChoice(size: size)
+        case .mirrorHall: scene = Trial8_MirrorHall(size: size)
+        case .candles: scene = Trial9_Candles(size: size)
+        case .whispers: scene = Trial10_Whispers(size: size)
+        case .shadows: scene = Trial11_Shadows(size: size)
+        case .clock: scene = Trial12_Clock(size: size)
+        case .rhyme: scene = Trial13_Rhyme(size: size)
+        case .lastDesk: scene = Trial14_LastDesk(size: size)
+        }
+
+        scene.scaleMode = scaleMode
+        view?.presentScene(scene, transition: .fade(withDuration: 0.25))
     }
 }
