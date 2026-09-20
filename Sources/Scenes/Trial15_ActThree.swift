@@ -73,12 +73,28 @@ class ActThreeTrialBase: SKScene {
     }
 
     private func buildBell() {
-        let b=box("Слушай ритм и повтори его")
+        let b=box("Слушай и СМОТРИ: колокола загораются по очереди")
         sequence=[0,1,0,2,1]
-        for i in 0..<3 { button(b,"●","bell_\(i)",CGFloat(i-1)*88,20) }
-        let l=SKLabelNode(text:"Нажми: 5 ударов"); l.name="status"; l.fontName="AvenirNext-Bold"; l.fontSize=15; l.fontColor=Palette.textDim; l.position=CGPoint(x:0,y:-75); b.addChild(l)
-        let bellActions: [SKAction] = sequence.map { i in SKAction.sequence([.run { Audio.shared.tone(freq: [180.0,240.0,320.0][i], duration:0.22, volume:0.2) }, .wait(forDuration:0.28)]) }
-        run(.sequence(bellActions))
+        for i in 0..<3 {
+            let n=button(b,"●","bell_\(i)",CGFloat(i-1)*88,20)
+            n.alpha=0.48
+        }
+        let l=SKLabelNode(text:"Слушай последовательность…"); l.name="status"; l.fontName="AvenirNext-Bold"; l.fontSize=14; l.fontColor=Palette.textDim; l.position=CGPoint(x:0,y:-75); b.addChild(l)
+        let actions: [SKAction] = sequence.enumerated().map { pair in
+            let i=pair.element
+            return .sequence([
+                .run { [weak self] in
+                    guard let self else { return }
+                    if let n=self.childNode(withName:"//bell_\\(i)") { n.run(.sequence([.group([.fadeAlpha(to:1,duration:0.08),.scale(to:1.16,duration:0.08)]),.wait(forDuration:0.20),.group([.fadeAlpha(to:0.48,duration:0.10),.scale(to:1,duration:0.10)])])) }
+                    Audio.shared.tone(freq:[180.0,240.0,320.0][i],duration:0.22,volume:0.22)
+                },
+                .wait(forDuration:0.34)
+            ])
+        }
+        run(.sequence(actions)) {
+            l.text="Твоя очередь • 5 ударов"
+            l.fontColor=Palette.cyan
+        }
     }
 
     private func buildClassZero() {
@@ -92,9 +108,26 @@ class ActThreeTrialBase: SKScene {
         let b=box("Запомни порядок символов")
         sequence=[2,0,3,1]
         let symbols=["△","○","✕","□"]
-        for i in 0..<4 { let n=button(b,symbols[i],"note_\(i)",(CGFloat(i) - 1.5)*70,20); n.name="note_\(i)" }
-        let l=SKLabelNode(text:"После появления — повтори"); l.name="status"; l.fontName="AvenirNext-Bold"; l.fontSize=14; l.fontColor=Palette.textDim; l.position=CGPoint(x:0,y:-75); b.addChild(l)
-        run(.sequence([.wait(forDuration:2.0),.run { [weak self] in self?.changed=true; (self?.childNode(withName:"//status") as? SKLabelNode)?.text="Теперь повтори последовательность" }]))
+        for i in 0..<4 {
+            let n=button(b,symbols[i],"note_\(i)",(CGFloat(i) - 1.5)*70,20)
+            n.name="note_\(i)"
+            n.alpha=0.92
+        }
+        let l=SKLabelNode(text:"Запомни: 4 символа"); l.name="status"; l.fontName="AvenirNext-Bold"; l.fontSize=14; l.fontColor=Palette.cyan; l.position=CGPoint(x:0,y:-75); b.addChild(l)
+        run(.sequence([
+            .wait(forDuration:1.8),
+            .run { [weak self] in
+                guard let self else { return }
+                self.changed=true
+                for i in 0..<4 {
+                    if let n=self.childNode(withName:"//note_\(i)") as? SKShapeNode {
+                        n.run(.fadeAlpha(to:0.42,duration:0.18))
+                        n.children.compactMap{$0 as? SKLabelNode}.forEach { $0.run(.fadeAlpha(to:0,duration:0.18)) }
+                    }
+                }
+                (self.childNode(withName:"//status") as? SKLabelNode)?.text="Теперь повтори • 0 / 4"
+            }
+        ]))
     }
 
     private func buildSchoolBell() {
@@ -121,7 +154,13 @@ class ActThreeTrialBase: SKScene {
             if name.hasPrefix("step_") { let parts=name.split(separator:"_"); if parts.count==3,let r=Int(parts[1]),let c=Int(parts[2]) { if c==sequence[r] { input.append(r); if input.count==4 {complete()} } else { failPulse(node); input.removeAll() } }; return }
             if name.hasPrefix("bell_"),let i=Int(name.dropFirst(5)) { input.append(i); let ok=input.indices.allSatisfy { input[$0]==sequence[$0] }; if !ok {resetInput()} else if input.count==sequence.count {complete()}; return }
             if name.hasPrefix("item_"),let i=Int(name.dropFirst(5)) { i==target ? complete() : failPulse(node); return }
-            if name.hasPrefix("note_"),let i=Int(name.dropFirst(5)) { if !changed {failPulse(node); return}; input.append(i); if input.count==sequence.count { input==sequence ? complete():resetInput() }; return }
+            if name.hasPrefix("note_"),let i=Int(name.dropFirst(5)) {
+                if !changed { failPulse(node); return }
+                input.append(i)
+                (childNode(withName:"//status") as? SKLabelNode)?.text="Теперь повтори • \(input.count) / \(sequence.count)"
+                if input.count==sequence.count { input==sequence ? complete():resetInput() }
+                return
+            }
             if name=="stopClock" { if (childNode(withName:"//clock") as? SKLabelNode)?.text == "13:13" { complete() } else { failPulse(node) }; return }
             if name.hasPrefix("ending_"),let i=Int(name.dropFirst(7)) { SaveManager.shared.setEnding(i); complete(); return }
             n=node.parent
@@ -129,7 +168,15 @@ class ActThreeTrialBase: SKScene {
     }
 
     private func updateStatus(){ (childNode(withName:"//status") as? SKLabelNode)?.text="Введено: "+input.map(String.init).joined(separator:" ") }
-    private func resetInput(){ input.removeAll(); (childNode(withName:"//status") as? SKLabelNode)?.text="ОШИБКА — СНАЧАЛА" ; failPulse(self) }
+    private func resetInput(){
+        input.removeAll()
+        if trial == .notebook {
+            (childNode(withName:"//status") as? SKLabelNode)?.text="ОШИБКА — снова: 0 / 4"
+        } else {
+            (childNode(withName:"//status") as? SKLabelNode)?.text="ОШИБКА — СНАЧАЛА"
+        }
+        failPulse(self)
+    }
     private func failPulse(_ node:SKNode){ Haptics.error(); Audio.shared.tone(freq:90,duration:0.12,volume:0.16); node.run(.sequence([.scale(to:0.92,duration:0.06),.scale(to:1,duration:0.06)])) }
     private func complete(){
         guard !finished else{return}; finished=true; Audio.shared.tone(freq:760,duration:0.22,volume:0.22); FX.flash(on:self,color:Palette.magenta,duration:0.22)
