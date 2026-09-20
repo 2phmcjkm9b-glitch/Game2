@@ -41,10 +41,8 @@ class ActThreeTrialBase: SKScene {
         switch trial {
         case .director: buildCode()
         case .stairs: buildStairs()
-        case .bell: buildBell()
-        case .classZero: buildClassZero()
-        case .notebook: buildNotebook()
-        case .schoolBell: buildSchoolBell()
+                case .classZero: buildClassZero()
+                case .schoolBell: buildSchoolBell()
         case .lastDoor: buildLastDoor()
         default: break
         }
@@ -99,7 +97,7 @@ class ActThreeTrialBase: SKScene {
         ]))
     }
 
-    private func buildBell() {
+    private func buildBell_REMOVED() {
         let b=box("Слушай и СМОТРИ: колокола загораются по очереди")
         sequence=[0,1,0,2,1]
         for i in 0..<3 {
@@ -135,7 +133,7 @@ class ActThreeTrialBase: SKScene {
         let clue=SKLabelNode(text:"Один предмет не принадлежит классу"); clue.fontName="AvenirNext-Regular"; clue.fontSize=12; clue.fontColor=Palette.textDim; clue.position=CGPoint(x:0,y:-120); b.addChild(clue)
     }
 
-    private func buildNotebook() {
+    private func buildNotebook_REMOVED() {
         let b=box("Запомни порядок символов")
         sequence=[2,0,3,1]
         let symbols=["△","○","✕","□"]
@@ -232,8 +230,6 @@ class ActThreeTrialBase: SKScene {
 
 final class Trial15_Director: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.director)}; required init?(coder:NSCoder){fatalError()} }
 final class Trial16_Stairs: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.stairs)}; required init?(coder:NSCoder){fatalError()} }
-final class Trial17_Bell: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.bell)}; required init?(coder:NSCoder){fatalError()} }
 final class Trial18_ClassZero: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.classZero)}; required init?(coder:NSCoder){fatalError()} }
-final class Trial19_Notebook: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.notebook)}; required init?(coder:NSCoder){fatalError()} }
 final class Trial20_SchoolBell: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.schoolBell)}; required init?(coder:NSCoder){fatalError()} }
 final class Trial21_LastDoor: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.lastDoor)}; required init?(coder:NSCoder){fatalError()} }
