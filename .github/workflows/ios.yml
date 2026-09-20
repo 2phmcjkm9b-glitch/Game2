@@ -1,4 +1,5 @@
 name: iOS Build
+# Build after syntax fixes
 on:
   push:
     branches: [ main ]
