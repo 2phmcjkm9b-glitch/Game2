@@ -55,6 +55,9 @@ final class HundredLevelsScene: SKScene {
         let next = button("›", x: size.width/2+65, y: 35, name: "next")
         prev.alpha = chapter == 1 ? 0.35 : 1
         next.alpha = chapter == 10 ? 0.35 : 1
+        addChild(back)
+        addChild(prev)
+        addChild(next)
         _ = page
         addChild(FX.vignette(size: size, intensity: 0.70))
     }
