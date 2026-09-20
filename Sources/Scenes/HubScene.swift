@@ -28,7 +28,7 @@ final class HubScene: SKScene {
         title.fontName = "AvenirNext-Bold"
         title.fontSize = 24
         title.fontColor = act == 1 ? Palette.text : Palette.blood
-        title.position = CGPoint(x: size.width / 2, y: size.height * 0.76)
+        title.position = CGPoint(x: size.width / 2, y: size.height * 0.70)
         title.zPosition = 20
         addChild(title)
         FX.pulse(title, scale: 1.025, duration: 1.6)
@@ -38,7 +38,7 @@ final class HubScene: SKScene {
         subtitle.fontName = "AvenirNext-Medium"
         subtitle.fontSize = 15
         subtitle.fontColor = Palette.textDim
-        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.71)
+        subtitle.position = CGPoint(x: size.width / 2, y: size.height * 0.66)
         subtitle.zPosition = 20
         addChild(subtitle)
     }
@@ -48,13 +48,17 @@ final class HubScene: SKScene {
 
         let trials = act == 1 ? Array(Trial.allCases.filter { $0.rawValue <= 10 }) : Array(Trial.allCases.filter { $0.rawValue >= 11 })
         let positions: [CGPoint] = [
-            CGPoint(x: size.width * 0.22, y: size.height * 0.64),
-            CGPoint(x: size.width * 0.50, y: size.height * 0.64),
-            CGPoint(x: size.width * 0.78, y: size.height * 0.64),
-            CGPoint(x: size.width * 0.22, y: size.height * 0.47),
-            CGPoint(x: size.width * 0.50, y: size.height * 0.47),
-            CGPoint(x: size.width * 0.78, y: size.height * 0.47),
-            CGPoint(x: size.width * 0.50, y: size.height * 0.30)
+            CGPoint(x: size.width * 0.17, y: size.height * 0.62),
+            CGPoint(x: size.width * 0.39, y: size.height * 0.62),
+            CGPoint(x: size.width * 0.61, y: size.height * 0.62),
+            CGPoint(x: size.width * 0.83, y: size.height * 0.62),
+            CGPoint(x: size.width * 0.17, y: size.height * 0.45),
+            CGPoint(x: size.width * 0.39, y: size.height * 0.45),
+            CGPoint(x: size.width * 0.61, y: size.height * 0.45),
+            CGPoint(x: size.width * 0.83, y: size.height * 0.45),
+            CGPoint(x: size.width * 0.28, y: size.height * 0.28),
+            CGPoint(x: size.width * 0.50, y: size.height * 0.28),
+            CGPoint(x: size.width * 0.72, y: size.height * 0.28)
         ]
 
         for (index, trial) in trials.enumerated() where index < positions.count {
