@@ -19,9 +19,16 @@ final class SaveManager {
     private(set) var data: Data
 
     private init() {
-        if let raw = defaults.data(forKey: key), let decoded = try? JSONDecoder().decode(Data.self, from: raw) {
-            data = decoded
-        } else { data = Data() }
+        if let raw = defaults.data(forKey: key) {
+            if let decoded = try? JSONDecoder().decode(Data.self, from: raw) {
+                data = decoded
+            } else {
+                // Migrate older saves that do not contain the puzzlePieces field.
+                data = Data()
+            }
+        } else {
+            data = Data()
+        }
         recomputeUnlocks()
     }
 
@@ -55,12 +62,22 @@ final class SaveManager {
     func setSignedNotebook(_ signed: Bool) { data.signedNotebook = signed; save() }
 
     private func recomputeUnlocks() {
-        data.actTwoUnlocked = Trial.actOne.allSatisfy { data.completedTrials.contains($0.rawValue) }
+        let firstAct = Trial.storyOrder.filter { $0.act == 1 }
+        data.actTwoUnlocked = firstAct.allSatisfy { data.completedTrials.contains($0.rawValue) }
     }
 
     func reset() { data = Data(); save() }
 
-    var progressActOne: Double { Double(Trial.actOne.filter { data.completedTrials.contains($0.rawValue) }.count) / Double(max(1, Trial.actOne.count)) }
-    var progressActTwo: Double { Double(Trial.actTwo.filter { data.completedTrials.contains($0.rawValue) }.count) / Double(max(1, Trial.actTwo.count)) }
-    var progress: Double { Double(data.completedTrials.count) / Double(max(1, Trial.actOne.count + Trial.actTwo.count + Trial.interludes.count)) }
+    var progressActOne: Double {
+        let levels = Trial.storyOrder.filter { $0.act == 1 }
+        return Double(levels.filter { data.completedTrials.contains($0.rawValue) }.count) / Double(max(1, levels.count))
+    }
+    var progressActTwo: Double {
+        let levels = Trial.storyOrder.filter { $0.act == 2 }
+        return Double(levels.filter { data.completedTrials.contains($0.rawValue) }.count) / Double(max(1, levels.count))
+    }
+    var progress: Double {
+        let levels = Trial.storyOrder
+        return Double(levels.filter { data.completedTrials.contains($0.rawValue) }.count) / Double(max(1, levels.count))
+    }
 }
