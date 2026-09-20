@@ -23,15 +23,15 @@ final class HubScene: SKScene {
     }
 
     private func buildHeader() {
-        let title = SKLabelNode(text: act == 1 ? "КАРТА ШКОЛЫ" : "ПОДВАЛ")
+        let title = SKLabelNode(text: act == 1 ? "КАРТА ШКОЛЫ" : (act == 2 ? "ПОДВАЛ" : "ЧЁРНЫЙ ЭТАЖ"))
         title.fontName = "AvenirNext-Bold"
         title.fontSize = 24
-        title.fontColor = act == 1 ? Palette.text : Palette.blood
+        title.fontColor = act == 1 ? Palette.text : (act == 2 ? Palette.blood : Palette.magenta)
         title.position = CGPoint(x: size.width / 2, y: size.height * 0.76)
         title.zPosition = 20
         addChild(title)
 
-        let subtitle = SKLabelNode(text: act == 1 ? "АКТ I • выбери доступный уровень" : "АКТ II • выбери доступный уровень")
+        let subtitle = SKLabelNode(text: "АКТ \(act) • выбери доступный уровень")
         subtitle.fontName = "AvenirNext-Medium"
         subtitle.fontSize = 15
         subtitle.fontColor = Palette.textDim
@@ -43,7 +43,7 @@ final class HubScene: SKScene {
     private func buildLevels() {
         levelNodes.removeAll()
 
-        let trials = act == 1 ? Trial.actOne : Trial.actTwo
+        let trials = act == 1 ? Trial.actOne : (act == 2 ? Trial.actTwo : Trial.actThree)
         let positions: [CGPoint] = [
             CGPoint(x: size.width * 0.22, y: size.height * 0.64),
             CGPoint(x: size.width * 0.50, y: size.height * 0.64),
@@ -100,7 +100,7 @@ final class HubScene: SKScene {
         back.zPosition = 30
         addChild(back)
 
-        let switchButton = SKLabelNode(text: act == 1 ? "АКТ II →" : "← АКТ I")
+        let switchButton = SKLabelNode(text: act == 1 ? "АКТ II →" : (act == 2 ? "АКТ III →" : "← АКТ II"))
         switchButton.fontName = "AvenirNext-Bold"
         switchButton.fontSize = 18
         switchButton.fontColor = Palette.blood
@@ -123,7 +123,7 @@ final class HubScene: SKScene {
             }
 
             if current.name == "switchAct" {
-                let nextAct = act == 1 ? 2 : 1
+                let nextAct = act == 1 ? 2 : (act == 2 ? 3 : 2)
                 let hub = HubScene(size: size, act: nextAct)
                 hub.scaleMode = scaleMode
                 view?.presentScene(hub, transition: .fade(withDuration: 0.25))
@@ -159,6 +159,13 @@ final class HubScene: SKScene {
         case .clock: scene = Trial12_Clock(size: size)
         case .rhyme: scene = Trial13_Rhyme(size: size)
         case .lastDesk: scene = Trial14_LastDesk(size: size)
+        case .director: scene = Trial15_Director(size: size)
+        case .stairs: scene = Trial16_Stairs(size: size)
+        case .bell: scene = Trial17_Bell(size: size)
+        case .classZero: scene = Trial18_ClassZero(size: size)
+        case .notebook: scene = Trial19_Notebook(size: size)
+        case .schoolBell: scene = Trial20_SchoolBell(size: size)
+        case .lastDoor: scene = Trial21_LastDoor(size: size)
         }
 
         scene.scaleMode = scaleMode
