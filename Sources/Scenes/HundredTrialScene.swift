@@ -29,7 +29,9 @@ final class HundredTrialScene: SKScene {
         Audio.shared.start()
         Audio.shared.drone(freq: 34, duration: 2.0, volume: 0.10)
 
-        let title = SKLabelNode(text: "\(String(format: "%02d", level.id)). \(level.title.uppercased())")
+        let displayNumber = mainTrial?.displayNumber ?? level.id
+        let displayTitle = mainTrial?.title ?? level.title
+        let title = SKLabelNode(text: "\(String(format: "%02d", displayNumber)). \(displayTitle.uppercased())")
         title.fontName = "AvenirNext-Heavy"
         title.fontSize = 21
         title.fontColor = Palette.blood
