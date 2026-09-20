@@ -4,8 +4,6 @@ final class MenuScene: SKScene {
     override func didMove(to view: SKView) {
         removeAllChildren()
         backgroundColor = Palette.bgDeep
-        FX.atmosphere(in: self, accent: Palette.magenta)
-        FX.scanline(in: self, color: Palette.magenta)
 
         let top = SKLabelNode(text: "АРХИВ • 13")
         top.fontName = "AvenirNext-Bold"
@@ -22,8 +20,6 @@ final class MenuScene: SKScene {
         title.position = CGPoint(x: size.width / 2, y: size.height * 0.68)
         title.zPosition = 20
         addChild(title)
-        FX.pulse(title, scale: 1.018, duration: 2.0)
-        FX.glitchTitle(title)
 
         let line = SKShapeNode(rectOf: CGSize(width: 155, height: 1))
         line.position = CGPoint(x: size.width / 2, y: size.height * 0.635)
@@ -66,7 +62,6 @@ final class MenuScene: SKScene {
         hint.name = "startButton"
         panel.addChild(hint)
 
-        FX.pulse(panel, scale: 1.025, duration: 1.5)
 
         let hundred = NeonButton(title: "100 ИСПЫТАНИЙ",
                                   size: CGSize(width: size.width * 0.65, height: 52),
@@ -88,7 +83,6 @@ final class MenuScene: SKScene {
         footer.position = CGPoint(x: size.width / 2, y: 28)
         addChild(footer)
 
-        addChild(FX.vignette(size: size, intensity: 0.72))
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
