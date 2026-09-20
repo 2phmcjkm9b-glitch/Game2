@@ -7,6 +7,8 @@ class ActTwoTrialBase: SKScene {
     private var targetIndex = 0
     private var candleLit = [Bool]()
     private var clockChanged = false
+    private var wordLabel: SKLabelNode?
+    private var wordProgress = ""
 
     init(size: CGSize, trial: Trial) {
         self.trial = trial
@@ -157,6 +159,8 @@ class ActTwoTrialBase: SKScene {
         selected.name = "word"
         selected.fontName = "AvenirNext-Bold"; selected.fontSize = 16; selected.fontColor = Palette.cyan
         selected.position = CGPoint(x: 0, y: -125); box.addChild(selected)
+        wordLabel = selected
+        wordProgress = ""
     }
 
     private func buildShadows() {
@@ -248,15 +252,19 @@ class ActTwoTrialBase: SKScene {
                 }
                 if name.hasPrefix("letter_") {
                     let parts = name.split(separator: "_")
-                    if parts.count >= 3, let letterNode = childNode(withName: "word") as? SKLabelNode {
+                    if parts.count >= 3, let letterNode = wordLabel {
                         let letter = String(parts[2])
-                        let current = letterNode.text?.replacingOccurrences(of: "Выбрано: ", with: "") ?? ""
-                        if current.count < 5 {
-                            let next = current + letter
+                        let target = "ШКОЛА"
+                        let next = wordProgress + letter
+                        if target.hasPrefix(next) {
+                            wordProgress = next
                             letterNode.text = "Выбрано: " + next
                             Audio.shared.tone(freq: 300 + Double(next.count) * 70, duration: 0.09, volume: 0.14)
-                            if next == "ШКОЛА" { complete() }
-                            else if next.count == 5 { letterNode.text = "Выбрано: " }
+                            if next == target { complete() }
+                        } else {
+                            wordProgress = ""
+                            letterNode.text = "Выбрано: "
+                            failPulse(n)
                         }
                     }
                     return
