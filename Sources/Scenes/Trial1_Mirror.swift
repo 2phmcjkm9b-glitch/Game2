@@ -40,7 +40,6 @@ final class Trial1_Mirror: SKScene {
         addBackButton()
         Audio.shared.start()
         Audio.shared.drone(freq: 60, duration: 3.0, volume: 0.10)
-        Audio.shared.drone(freq: 60, duration: 3.0, volume: 0.1)
     }
 
     private func buildGrid() {
@@ -99,12 +98,6 @@ final class Trial1_Mirror: SKScene {
         let b = SKShapeNode(rectOf: CGSize(width: 120, height: 42), cornerRadius: 10)
         b.position = CGPoint(x: 70, y: 35); b.fillColor = SKColor(white: 0.06, alpha: 1); b.strokeColor = Palette.textDim; b.name = "backButton"
         let l = SKLabelNode(text: "← НАЗАД"); l.fontName = "AvenirNext-Bold"; l.fontSize = 13; l.fontColor = Palette.text; l.verticalAlignmentMode = .center; b.addChild(l); addChild(b)
-    }
-
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let p = touches.first?.location(in: self) else { return }
-        if p.y < 80 && p.x < 150 { let hub = HubScene(size: size); hub.scaleMode = scaleMode; view?.presentScene(hub, transition: .fade(withDuration: 0.25)); return }
-        if holdingIndex != nil { return }
     }
 
     override func update(_ currentTime: TimeInterval) {
