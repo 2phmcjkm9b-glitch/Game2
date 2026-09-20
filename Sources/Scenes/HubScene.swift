@@ -1,6 +1,8 @@
 import SpriteKit
 
 final class HubScene: SKScene {
+    private var trialButtons: [(Trial, NeonButton)] = []
+
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
         isUserInteractionEnabled = true
@@ -24,18 +26,28 @@ final class HubScene: SKScene {
                 y: size.height * 0.75 - CGFloat(trial.rawValue - 1) * 58
             )
 
-            // Все 7 испытаний доступны для тестирования.
             button.setEnabled(true)
-
-            button.action = { [weak self, weak button] in
-                guard let self, let button, button.isEnabled else { return }
-                self.open(trial)
-            }
+            // Touches are handled by the scene, not by the child node.
+            button.isUserInteractionEnabled = false
 
             addChild(button)
+            trialButtons.append((trial, button))
         }
 
         addChild(FX.vignette(size: size))
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let point = touch.location(in: self)
+
+        for (trial, button) in trialButtons.reversed() {
+            if button.isHidden || button.alpha <= 0 || !button.isEnabled { continue }
+            if button.calculateAccumulatedFrame().contains(point) {
+                open(trial)
+                return
+            }
+        }
     }
 
     private func open(_ trial: Trial) {
