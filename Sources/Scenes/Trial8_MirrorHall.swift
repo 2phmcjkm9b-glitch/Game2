@@ -92,40 +92,47 @@ class ActTwoTrialBase: SKScene {
     }
 
     private func buildMirrorPuzzle() {
-        let box = card("Найди одно ложное отражение")
-        targetIndex = Int.random(in: 0..<9)
-        for i in 0..<9 {
-            let col = i % 3
-            let row = i / 3
-            let m = SKShapeNode(rectOf: CGSize(width: size.width * 0.19, height: 68), cornerRadius: 10)
-            m.position = CGPoint(x: CGFloat(col - 1) * size.width * 0.24, y: 72 - CGFloat(row) * 72)
+        let box = card("Найди единственное отражение, которое слегка врёт")
+        let count = 12
+        targetIndex = Int.random(in: 0..<count)
+
+        for i in 0..<count {
+            let col = i % 4
+            let row = i / 4
+            let m = SKShapeNode(rectOf: CGSize(width: size.width * 0.16, height: 58), cornerRadius: 9)
+            m.position = CGPoint(x: CGFloat(col - 1.5) * size.width * 0.205, y: 92 - CGFloat(row) * 68)
             m.fillColor = SKColor(white: 0.08, alpha: 1)
-            m.strokeColor = Palette.cyan.withAlphaComponent(0.7)
-            m.name = "mirror_\(i)"
+            m.strokeColor = Palette.cyan.withAlphaComponent(0.65)
+            m.name = "mirror_\\(i)"
 
             let line = SKShapeNode()
             let p = CGMutablePath()
-            p.move(to: CGPoint(x: -24, y: 20))
-            p.addLine(to: CGPoint(x: 0, y: -16))
-            p.addLine(to: CGPoint(x: 24, y: 20))
-            p.addLine(to: CGPoint(x: 0, y: 2))
+            p.move(to: CGPoint(x: -18, y: 17))
+            p.addLine(to: CGPoint(x: 0, y: -13))
+            p.addLine(to: CGPoint(x: 18, y: 17))
+            p.addLine(to: CGPoint(x: 0, y: 0))
             line.path = p
             line.strokeColor = Palette.text
-            line.lineWidth = 2
-            m.addChild(line)
+            line.lineWidth = 1.7
 
+            let inner = SKShapeNode()
+            let ip = CGMutablePath()
             if i == targetIndex {
-                let crack = SKShapeNode()
-                let cp = CGMutablePath()
-                cp.move(to: CGPoint(x: 5, y: 7))
-                cp.addLine(to: CGPoint(x: 11, y: 1))
-                cp.addLine(to: CGPoint(x: 7, y: -6))
-                crack.path = cp
-                crack.strokeColor = Palette.blood.withAlphaComponent(0.85)
-                crack.lineWidth = 1.4
-                m.addChild(crack)
+                ip.move(to: CGPoint(x: -6, y: -3))
+                ip.addLine(to: CGPoint(x: 6, y: 7))
+                ip.addLine(to: CGPoint(x: -5, y: 12))
+            } else {
+                ip.move(to: CGPoint(x: -6, y: 7))
+                ip.addLine(to: CGPoint(x: 6, y: -3))
+                ip.addLine(to: CGPoint(x: 5, y: 12))
             }
-            box.addChild(m)
+            inner.path = ip
+            inner.strokeColor = Palette.textDim
+            inner.lineWidth = 1.2
+
+            m.addChild(line)
+            m.addChild(inner)
+            addChild(m)
         }
     }
 
