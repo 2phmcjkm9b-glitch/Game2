@@ -12,7 +12,7 @@ final class Trial3_DarkCorridor: SKScene {
     override func didMove(to view: SKView) {
         backgroundColor = .black
 
-        let header = SKLabelNode(text: "ТЁМНЫЙ КОРИДОР")
+        let header = SKLabelNode(text: "02. ТЁМНЫЙ КОРИДОР")
         header.fontName = "AvenirNext-Heavy"
         header.fontSize = 22
         header.fontColor = Palette.cyan
