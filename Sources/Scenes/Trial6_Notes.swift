@@ -25,7 +25,6 @@ final class Trial6_Notes: SKScene {
         addChild(counter)
 
         let cols = 2
-        let rows = 3
         let w = size.width * 0.36
         let h = size.height * 0.14
         for i in 0..<6 {
@@ -74,7 +73,7 @@ final class Trial6_Notes: SKScene {
             var current: SKNode? = node
             while let candidate = current {
                 if let name = candidate.name, name.hasPrefix("note_"),
-                   let index = Int(name.dropFirst(5)) {
+                   _ = Int(name.dropFirst(5)) {
                     if candidate.alpha > 0.5 {
                         candidate.alpha = 0.35
                         if let text = candidate.children.compactMap({ $0 as? SKLabelNode }).first {
