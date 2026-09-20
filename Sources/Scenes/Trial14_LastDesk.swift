@@ -9,7 +9,7 @@ final class Trial14_LastDesk: SKScene {
         Audio.shared.start()
         Audio.shared.drone(freq: 44, duration: 2.0, volume: 0.10)
 
-        let title = SKLabelNode(text: "14. ПОСЛЕДНЯЯ ПАРТА")
+        let title = SKLabelNode(text: "11. ПОСЛЕДНЯЯ ПАРТА")
         title.fontName = "AvenirNext-Heavy"
         title.fontSize = 23
         title.fontColor = Palette.blood
