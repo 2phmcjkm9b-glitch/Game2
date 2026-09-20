@@ -17,6 +17,7 @@ final class HubScene: SKScene {
     override func didMove(to view: SKView) {
         removeAllChildren()
         backgroundColor = Palette.bg
+        FX.atmosphere(in: self, accent: act == 3 ? Palette.magenta : (act == 2 ? Palette.blood : Palette.cyan))
         buildHeader()
         buildLevels()
         buildBackButton()
@@ -30,6 +31,8 @@ final class HubScene: SKScene {
         title.position = CGPoint(x: size.width / 2, y: size.height * 0.76)
         title.zPosition = 20
         addChild(title)
+        FX.pulse(title, scale: 1.025, duration: 1.6)
+        FX.glitchTitle(title)
 
         let subtitle = SKLabelNode(text: "АКТ \(act) • выбери доступный уровень")
         subtitle.fontName = "AvenirNext-Medium"
@@ -86,6 +89,8 @@ final class HubScene: SKScene {
             node.addChild(label)
 
             addChild(node)
+            FX.pulse(node, scale: 1.025, duration: 1.7 + Double(index % 3) * 0.2)
+            node.run(.fadeAlpha(to: 0.82, duration: 0.01))
             levelNodes.append(node)
         }
     }
