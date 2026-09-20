@@ -34,7 +34,7 @@ final class HundredTrialScene: SKScene {
 
         let back=SKShapeNode(rectOf:CGSize(width:120,height:42),cornerRadius:10)
         back.position=CGPoint(x:70,y:35); back.fillColor=Palette.panel; back.strokeColor=Palette.textDim; back.name="back"
-        let bl=SKLabelNode(text:"← НАЗАД"); bl.fontName="AvenirNext-Bold"; bl.fontSize=13; bl.fontColor=Palette.text; bl.verticalAlignmentMode=.center; bl.name="back"; back.addChild(bl); addChild(back)
+        let bl=SKLabelNode(text:"← НАЗАД"); bl.fontName="AvenirNext-Bold"; bl.fontSize=13; bl.fontColor=Palette.text; bl.verticalAlignmentMode = .center; bl.name="back"; back.addChild(bl); addChild(back)
         addChild(FX.vignette(size:size,intensity:0.68))
     }
 
@@ -68,7 +68,7 @@ final class HundredTrialScene: SKScene {
     private func makeCell(_ text:String,_ name:String,_ x:CGFloat,_ y:CGFloat)->SKShapeNode {
         let b=SKShapeNode(rectOf:CGSize(width:62,height:52),cornerRadius:10)
         b.position=CGPoint(x:x,y:y); b.fillColor=Palette.panel; b.strokeColor=Palette.cyanSoft; b.lineWidth=1.5; b.name=name; b.zPosition=10
-        let l=SKLabelNode(text:text); l.fontName="AvenirNext-Bold"; l.fontSize=18; l.fontColor=Palette.text; l.verticalAlignmentMode=.center; l.name=name; b.addChild(l); addChild(b)
+        let l=SKLabelNode(text:text); l.fontName="AvenirNext-Bold"; l.fontSize=18; l.fontColor=Palette.text; l.verticalAlignmentMode = .center; l.name=name; b.addChild(l); addChild(b)
         return b
     }
 
@@ -111,7 +111,7 @@ final class HundredTrialScene: SKScene {
         let len=min(10,max(3,Int(level.params["len"] ?? Double(3+level.difficulty/2))))
         sequence=(0..<len).map{ _ in Int.random(in:0..<4) }
         for i in 0..<4 {
-            let x=size.width/2+CGFloat(i-1.5)*78
+            let x=size.width/2+(CGFloat(i) - 1.5)*78
             _=makeCell(["◆","●","▲","■"][i],"s_\(i)",x,size.height*0.45)
         }
         status.text="СМОТРИ..."
@@ -136,7 +136,7 @@ final class HundredTrialScene: SKScene {
         sequence=chosen
         for i in 0..<count {
             let c=i%cols,r=i/cols
-            let x=size.width/2+CGFloat(c-1.5)*68
+            let x=size.width/2+(CGFloat(c) - 1.5)*68
             let y=size.height*0.48+CGFloat(1-r)*62
             let b=makeCell(chosen.contains(i) ? "●":"·","m_\(i)",x,y)
             cells.append(b)
@@ -183,7 +183,7 @@ final class HundredTrialScene: SKScene {
         status.text="СКОЛЬКО ОГНЕЙ?"
         let start=amount-2
         for i in 0..<4 {
-            let b=makeCell("\(start+i)","n_\(start+i)",size.width/2+CGFloat(i-1.5)*68,size.height*0.25)
+            let b=makeCell("\(start+i)","n_\(start+i)",size.width/2+(CGFloat(i) - 1.5)*68,size.height*0.25)
             b.name="n_\(start+i)"
         }
     }
@@ -216,7 +216,7 @@ final class HundredTrialScene: SKScene {
     }
     private func solve(_ ok:Bool) {
         guard !solved else{return}
-        if ok { solved=true; SaveManager.shared.completeHundred(level.id); Haptics.success(); Audio.shared.tone(freq:720,duration:0.2,volume:0.22); status.text="ИСПЫТАНИЕ ПРОЙДЕНО"; FX.successBurst(on:self,at:CGPoint(x:size.width/2,y:size.height*0.48)); run(.sequence([.wait(forDuration:0.8),.run{[weak self] in self?.backToMap()}])) }
+        if ok { solved=true; SaveManager.shared.completeHundred(level.id); Haptics.success(); Audio.shared.tone(freq:720,duration:0.2,volume:0.22); status.text="ИСПЫТАНИЕ ПРОЙДЕНО"; FX.successBurst(in:self,at:CGPoint(x:size.width/2,y:size.height*0.48)); run(.sequence([.wait(forDuration:0.8),.run{[weak self] in self?.backToMap()}])) }
         else { Haptics.error(); Audio.shared.tone(freq:90,duration:0.12,volume:0.16); status.text="ОШИБКА • ПОПРОБУЙ ЕЩЁ"; run(.sequence([.scale(to:1.02,duration:0.06),.scale(to:1,duration:0.06)])) }
     }
     private func back() { backToMap() }
