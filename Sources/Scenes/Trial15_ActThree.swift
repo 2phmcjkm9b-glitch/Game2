@@ -225,7 +225,7 @@ class ActThreeTrialBase: SKScene {
         }
     }
     private func sceneEnd(){ SaveManager.shared.complete(trial.rawValue,time:Date().timeIntervalSince(startTime)); run(.sequence([.wait(forDuration:1.0),.run{[weak self] in guard let self else{return}; let e=EndingScene(size:self.size); e.scaleMode=self.scaleMode; self.view?.presentScene(e,transition:.fade(withDuration:0.7))}])) }
-    private func back(){ let h=HubScene(size:size,act:3); h.scaleMode=scaleMode; view?.presentScene(h,transition:.fade(withDuration:0.25)) }
+    private func back(){ let h=HubScene(size:size,act:2); h.scaleMode=scaleMode; view?.presentScene(h,transition:.fade(withDuration:0.25)) }
 }
 
 final class Trial15_Director: ActThreeTrialBase { init(size:CGSize){super.init(size:size,trial:.director)}; required init?(coder:NSCoder){fatalError()} }
