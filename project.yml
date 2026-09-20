@@ -1,6 +1,8 @@
 name: School13
 options:
   bundleIdPrefix: com.2phmcjkm9bglitch
+  projectFormat: xcode15_3
+  xcodeVersion: "15.3"
   deploymentTarget:
     iOS: "15.0"
   createIntermediateGroups: true
