@@ -189,7 +189,7 @@ class ActThreeTrialBase: SKScene {
             if node.name=="backButton" { back(); return }
             guard let name=node.name else { n=node.parent; continue }
             if name.hasPrefix("code_"),let v=Int(name.dropFirst(5)) { input.append(v); updateStatus(); if input.count==sequence.count { input == sequence ? complete() : resetInput() }; return }
-            if name.hasPrefix("step_") { let parts=name.split(separator:"_"); if parts.count==3,let r=Int(parts[1]),let c=Int(parts[2]) { if c==sequence[r] { input.append(r); if input.count==8 {complete()} } else { failPulse(node); input.removeAll() } }; return }
+            if name.hasPrefix("step_") { let parts=name.split(separator:"_"); if parts.count==3,let r=Int(parts[1]),let c=Int(parts[2]) { if r != input.count || c != sequence[r] { failPulse(node); input.removeAll() } else { input.append(r); if input.count==8 { complete() } } }; return }
             if name.hasPrefix("bell_"),let i=Int(name.dropFirst(5)) { input.append(i); let ok=input.indices.allSatisfy { input[$0]==sequence[$0] }; if !ok {resetInput()} else if input.count==sequence.count {complete()}; return }
             if name.hasPrefix("item_"),let i=Int(name.dropFirst(5)) { i==target ? complete() : failPulse(node); return }
             if name.hasPrefix("note_"),let i=Int(name.dropFirst(5)) {
