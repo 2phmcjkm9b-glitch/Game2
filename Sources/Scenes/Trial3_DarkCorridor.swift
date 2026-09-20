@@ -2,11 +2,12 @@ import SpriteKit
 
 final class Trial3_DarkCorridor: SKScene {
     private var player: SKShapeNode!
+    private var lightMask: SKShapeNode!
     private var obstacles: [(CGPoint, CGFloat)] = []
     private var exitNode: SKShapeNode!
     private var started = false
+    private var finished = false
     private var startTime: TimeInterval = 0
-    private var lastTime: TimeInterval = 0
 
     override func didMove(to view: SKView) {
         backgroundColor = .black
@@ -34,38 +35,50 @@ final class Trial3_DarkCorridor: SKScene {
         let start = CGPoint(x: size.width * 0.5, y: size.height * 0.12)
         let exit = CGPoint(x: size.width * 0.5, y: size.height * 0.82)
 
+        let crop = SKCropNode()
+        crop.name = "lightCrop"
+        crop.zPosition = 100
+        addChild(crop)
+
         let world = SKNode()
         world.name = "world"
-        addChild(world)
+        crop.addChild(world)
+
+        let mask = SKShapeNode(circleOfRadius: 112)
+        mask.fillColor = .white
+        mask.strokeColor = .clear
+        crop.maskNode = mask
+        lightMask = mask
 
         let walls = SKShapeNode(
-            rectOf: CGSize(width: size.width * 0.7, height: size.height * 0.78),
+            rectOf: CGSize(width: size.width * 0.70, height: size.height * 0.78),
             cornerRadius: 30
         )
         walls.position = CGPoint(x: size.width / 2, y: size.height * 0.47)
         walls.fillColor = SKColor(white: 0.08, alpha: 1)
-        walls.strokeColor = SKColor(white: 0.15, alpha: 1)
+        walls.strokeColor = SKColor(white: 0.22, alpha: 1)
         walls.lineWidth = 2
         world.addChild(walls)
 
+        obstacles.removeAll()
         for _ in 0..<9 {
-            let px = CGFloat.random(in: size.width * 0.22...size.width * 0.78)
+            let px = CGFloat.random(in: size.width * 0.25...size.width * 0.75)
             let py = CGFloat.random(in: size.height * 0.22...size.height * 0.72)
             let r = CGFloat.random(in: 22...38)
             obstacles.append((CGPoint(x: px, y: py), r))
 
             let obstacle = SKShapeNode(circleOfRadius: r)
             obstacle.position = CGPoint(x: px, y: py)
-            obstacle.fillColor = SKColor(white: 0.02, alpha: 1)
-            obstacle.strokeColor = Palette.blood.withAlphaComponent(0.0)
-            obstacle.lineWidth = 2
+            obstacle.fillColor = SKColor(white: 0.015, alpha: 1)
+            obstacle.strokeColor = Palette.blood.withAlphaComponent(0.18)
+            obstacle.lineWidth = 1.5
             obstacle.name = "shadow"
             world.addChild(obstacle)
         }
 
         exitNode = SKShapeNode(circleOfRadius: 26)
         exitNode.position = exit
-        exitNode.fillColor = Palette.amber.withAlphaComponent(0.25)
+        exitNode.fillColor = Palette.amber.withAlphaComponent(0.22)
         exitNode.strokeColor = Palette.amber
         exitNode.lineWidth = 3
         exitNode.glowWidth = 12
@@ -83,64 +96,67 @@ final class Trial3_DarkCorridor: SKScene {
         player.glowWidth = 8
         world.addChild(player)
 
-        let light = SKLightNode()
-        light.categoryBitMask = 0x1
-        light.falloff = 2.0
-        light.ambientColor = SKColor(white: 0.0, alpha: 1)
-        light.lightColor = SKColor(white: 0.9, alpha: 1)
-        light.position = player.position
-        light.name = "playerLight"
-        world.addChild(light)
+        lightMask.position = start
 
-        walls.lightingBitMask = 0x1
-        for node in world.children where node.name == "shadow" {
-            (node as? SKShapeNode)?.lightingBitMask = 0x1
-        }
-        exitNode.lightingBitMask = 0x1
-        player.lightingBitMask = 0x1
+        let ring = SKShapeNode(circleOfRadius: 112)
+        ring.fillColor = .clear
+        ring.strokeColor = Palette.cyan.withAlphaComponent(0.12)
+        ring.lineWidth = 2
+        ring.zPosition = 500
+        ring.name = "lightRing"
+        addChild(ring)
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-
+        guard !finished, let touch = touches.first else { return }
         if !started {
             started = true
-            startTime = lastTime
+            startTime = CACurrentMediaTime()
             Audio.shared.drone(freq: 40, duration: 3.0, volume: 0.12)
         }
-
         movePlayer(to: touch.location(in: self))
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
+        guard !finished, let touch = touches.first else { return }
         movePlayer(to: touch.location(in: self))
     }
 
     private func movePlayer(to point: CGPoint) {
-        guard let world = childNode(withName: "world"),
-              let light = world.childNode(withName: "playerLight") else { return }
+        guard player != nil, lightMask != nil else { return }
 
-        player.run(.move(to: point, duration: 0.06))
-        light.run(.move(to: point, duration: 0.06))
+        let minX = size.width * 0.15
+        let maxX = size.width * 0.85
+        let minY = size.height * 0.08
+        let maxY = size.height * 0.86
+        let p = CGPoint(
+            x: min(max(point.x, minX), maxX),
+            y: min(max(point.y, minY), maxY)
+        )
+
+        player.position = p
+        lightMask.position = p
+        childNode(withName: "lightRing")?.position = p
 
         for (center, radius) in obstacles {
-            if hypot(center.x - point.x, center.y - point.y) < radius + 10 {
+            if hypot(center.x - p.x, center.y - p.y) < radius + 10 {
                 hit()
                 return
             }
         }
 
-        if hypot(exitNode.position.x - point.x, exitNode.position.y - point.y) < 28 {
+        if hypot(exitNode.position.x - p.x, exitNode.position.y - p.y) < 30 {
             win()
         }
     }
 
     private func hit() {
+        guard !finished else { return }
+        finished = true
         started = false
         Haptics.error()
         FX.flash(on: self, color: Palette.blood, duration: 0.45)
-        FX.shake(camera ?? self, intensity: 18, duration: 0.5)
+        FX.shake(self, intensity: 8, duration: 0.3)
         Audio.shared.tone(freq: 90, duration: 0.5, volume: 0.3, type: .noise)
 
         run(.sequence([
@@ -155,13 +171,14 @@ final class Trial3_DarkCorridor: SKScene {
     }
 
     private func win() {
-        guard started else { return }
+        guard started, !finished else { return }
+        finished = true
         started = false
         FX.flash(on: self, color: Palette.amber, duration: 0.3)
-        GameFlow.completeAndReturn(self, trial: .darkCorridor, time: max(0, lastTime - startTime))
-    }
-
-    override func update(_ currentTime: TimeInterval) {
-        lastTime = currentTime
+        GameFlow.completeAndReturn(
+            self,
+            trial: .darkCorridor,
+            time: max(0, CACurrentMediaTime() - startTime)
+        )
     }
 }
