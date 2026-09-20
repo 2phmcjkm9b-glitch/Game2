@@ -16,7 +16,7 @@ final class Trial4_Doors: SKScene {
         backgroundColor = Palette.bgDeep
         addChild(VignetteNode(size: size, intensity: 0.9))
 
-        let header = SKLabelNode(text: "ДВЕРИ")
+        let header = SKLabelNode(text: "03. ДВЕРИ")
         header.fontName = "AvenirNext-Heavy"
         header.fontSize = 24
         header.fontColor = Palette.amber
