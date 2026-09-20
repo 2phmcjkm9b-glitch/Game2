@@ -8,6 +8,7 @@ class ActThreeTrialBase: SKScene {
     private var sequence:[Int] = []
     private var input:[Int] = []
     private var changed = false
+    private var clockTick = 0
 
     init(size: CGSize, trial: Trial) { self.trial = trial; super.init(size: size) }
     required init?(coder: NSCoder) { fatalError() }
@@ -165,30 +166,15 @@ class ActThreeTrialBase: SKScene {
         let clock=SKLabelNode(text:"13:10"); clock.name="clock"; clock.fontName="AvenirNext-Heavy"; clock.fontSize=46; clock.fontColor=Palette.text; clock.position=CGPoint(x:0,y:25); b.addChild(clock)
         let stop=button(b,"ОСТАНОВИТЬ","stopClock",0,-60)
         let vals=["13:10","13:11","13:12","13:13","13:14","13:15"]
-        run(.sequence([
-            .wait(forDuration:0.45),
+        run(.repeatForever(.sequence([
+            .wait(forDuration:0.65),
             .run { [weak self,weak clock] in
                 guard let self,let clock else{return}
+                self.clockTick = (self.clockTick + 1) % vals.count
                 self.changed=true
-                let tick=Int(clock.userData?["tick"] as? Int ?? 0)
-                let next=min(tick+1, vals.count-1)
-                if clock.userData == nil { clock.userData = NSMutableDictionary() }
-                clock.userData?["tick"]=next
-                clock.text=vals[next]
-            },
-            .repeatForever(.sequence([
-                .wait(forDuration:0.65),
-                .run { [weak self,weak clock] in
-                    guard let self,let clock else{return}
-                    let tick=Int(clock.userData?["tick"] as? Int ?? 0)
-                    let next=(tick+1) % vals.count
-                    if clock.userData == nil { clock.userData = NSMutableDictionary() }
-                    clock.userData?["tick"]=next
-                    clock.text=vals[next]
-                    self.changed=true
-                }
-            ]))
-        ]))
+                clock.text=vals[self.clockTick]
+            }
+        ])))
         stop.name="stopClock"
     }
 
