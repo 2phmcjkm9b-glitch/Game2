@@ -2,20 +2,28 @@ import UIKit
 import SpriteKit
 
 final class GameViewController: UIViewController {
+    private var didCreateScene = false
+
     override func loadView() {
-        let sk = SKView(frame: .zero)
+        let sk = SKView(frame: UIScreen.main.bounds)
+        sk.backgroundColor = .black
         sk.ignoresSiblingOrder = true
-        sk.preferredFramesPerSecond = 60
-        sk.isMultipleTouchEnabled = true
+        sk.isMultipleTouchEnabled = false
         view = sk
     }
 
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        createSceneIfNeeded()
+    }
 
-        guard let skView = view as? SKView else { return }
-        guard skView.bounds.width > 1, skView.bounds.height > 1 else { return }
-        guard skView.scene == nil else { return }
+    private func createSceneIfNeeded() {
+        guard !didCreateScene,
+              let skView = view as? SKView,
+              skView.bounds.width > 1,
+              skView.bounds.height > 1 else { return }
+
+        didCreateScene = true
 
         let scene = MenuScene(size: skView.bounds.size)
         scene.scaleMode = .resizeFill
