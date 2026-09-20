@@ -102,8 +102,25 @@ enum GameFlow {
 
         overlay.run(.sequence([
             .wait(forDuration: 0.15),
-            .run { title.run(.sequence([.scale(to: 1.08, duration: 0.25), .scale(to: 1.0, duration: 0.25)])) }
+            .run { title.run(.sequence([.scale(to: 1.08, duration: 0.25), .scale(to: 1.0, duration: 0.25)])) },
+            .wait(forDuration: 3.0),
+            .run {
+                overlay.removeFromParent()
+                let hub = HubScene(size: scene.size, act: trialActForPiece(piece))
+                hub.scaleMode = scene.scaleMode
+                scene.view?.presentScene(hub, transition: .fade(withDuration: 0.6))
+            }
         ]))
+    }
+
+    private static func trialActForPiece(_ piece: Int) -> Int {
+        switch piece {
+        case 1: return 1
+        case 2: return 2
+        case 3: return 3
+        case 4: return 4
+        default: return 5
+        }
     }
 
     static func handleRewardTouch(_ scene: SKScene, point: CGPoint, trial: Trial) -> Bool {
