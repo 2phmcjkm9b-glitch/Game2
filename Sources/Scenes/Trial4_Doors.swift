@@ -10,6 +10,7 @@ final class Trial4_Doors: SKScene {
     private var roundLabel: SKLabelNode!
     private let symbols = ["☾", "✦", "◈", "✶"]
     private var accepting = false
+    private var finished = false
 
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bgDeep
@@ -57,13 +58,14 @@ final class Trial4_Doors: SKScene {
             door.strokeColor = Palette.amber.withAlphaComponent(0.7)
             door.lineWidth = 2
             door.glowWidth = 4
-            door.name = "door_\\(i)"
+            door.name = "door_(i)"
 
             let symbol = SKLabelNode(text: symbols[i])
             symbol.fontName = "AvenirNext-Bold"
             symbol.fontSize = 48
             symbol.fontColor = Palette.text
             symbol.verticalAlignmentMode = .center
+            symbol.isUserInteractionEnabled = false
             door.addChild(symbol)
 
             addChild(door)
@@ -72,20 +74,21 @@ final class Trial4_Doors: SKScene {
     }
 
     private func nextRound() {
+        guard !finished else { return }
         round += 1
         if round > maxRounds {
             win()
             return
         }
 
-        roundLabel.text = "Раунд \\(round) / \\(maxRounds)"
+        roundLabel.text = "Раунд (round) / (maxRounds)"
         sequence = (0..<(round + 2)).map { _ in Int.random(in: 0..<4) }
         inputIndex = 0
         accepting = false
 
-        let preview = sequence.map { symbols[$0] }.joined(separator: "  ")
-        hintLabel.text = preview
+        hintLabel.text = sequence.map { symbols[$0] }.joined(separator: "  ")
         hintLabel.alpha = 0
+        hintLabel.removeAction(forKey: "hint")
         hintLabel.run(.sequence([
             .fadeIn(withDuration: 0.3),
             .wait(forDuration: 1.4),
@@ -95,44 +98,36 @@ final class Trial4_Doors: SKScene {
                 self?.hintLabel.alpha = 1
                 self?.accepting = true
             }
-        ]))
+        ]), withKey: "hint")
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard accepting, let point = touches.first?.location(in: self) else { return }
+        guard !finished, accepting, let point = touches.first?.location(in: self) else { return }
 
         var index: Int?
         for node in nodes(at: point) {
-            if let name = node.name, name.hasPrefix("door_") {
-                index = Int(name.replacingOccurrences(of: "door_", with: ""))
-                break
+            var current: SKNode? = node
+            while let candidate = current {
+                if let name = candidate.name, name.hasPrefix("door_") {
+                    index = Int(name.dropFirst(5))
+                    break
+                }
+                current = candidate.parent
             }
-            if let name = node.parent?.name, name.hasPrefix("door_") {
-                index = Int(name.replacingOccurrences(of: "door_", with: ""))
-                break
-            }
+            if index != nil { break }
         }
 
-        guard let idx = index, idx >= 0, idx < doors.count else { return }
+        guard let idx = index, idx >= 0, idx < doors.count, inputIndex < sequence.count else { return }
 
         let door = doors[idx]
-        Audio.shared.tone(freq: 440 + Double(idx) * 80, duration: 0.15, volume: 0.25)
         door.run(.sequence([
             .scale(to: 0.96, duration: 0.08),
             .scale(to: 1.0, duration: 0.08)
         ]))
 
         if sequence[inputIndex] == idx {
-            door.strokeColor = Palette.cyan
-            door.run(.sequence([
-                .wait(forDuration: 0.3),
-                .run { [weak self, weak door] in
-                    guard let self, let door else { return }
-                    door.strokeColor = Palette.amber.withAlphaComponent(0.7)
-                }
-            ]))
             inputIndex += 1
-
+            door.strokeColor = Palette.cyan
             if inputIndex == sequence.count {
                 accepting = false
                 run(.sequence([
@@ -141,11 +136,11 @@ final class Trial4_Doors: SKScene {
                 ]))
             }
         } else {
+            finished = true
             accepting = false
             Haptics.error()
             FX.flash(on: self, color: Palette.blood, duration: 0.4)
             door.strokeColor = Palette.blood
-
             run(.sequence([
                 .wait(forDuration: 0.9),
                 .run { [weak self] in
@@ -159,6 +154,8 @@ final class Trial4_Doors: SKScene {
     }
 
     private func win() {
+        guard !finished else { return }
+        finished = true
         FX.flash(on: self, color: Palette.amber, duration: 0.3)
         GameFlow.completeAndReturn(self, trial: .doors)
     }
