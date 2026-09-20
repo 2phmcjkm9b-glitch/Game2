@@ -332,19 +332,35 @@ final class HundredTrialScene: SKScene {
     private func buildChoice() {
         let count = min(5, max(3, Int(level.params["options"] ?? 3)))
         let base = max(3, level.id + level.difficulty)
-        let candidates: [Int] = Array(0..<count).map { i in base + i }
-        let primes = candidates.filter(isPrime)
-        let evens = candidates.filter { $0 % 2 == 0 }
-
-        if level.id % 2 == 0, let value = evens.first {
-            target = candidates.firstIndex(of: value) ?? 0
+        var candidates: [Int]
+        if level.id % 2 == 0 {
+            // Exactly one even number; all other doors are odd.
+            let evenValue = base % 2 == 0 ? base : base + 1
+            candidates = [evenValue]
+            var value = evenValue + 1
+            while candidates.count < count {
+                if value % 2 != 0 {
+                    candidates.append(value)
+                }
+                value += 1
+            }
+            candidates.shuffle()
+            target = candidates.firstIndex(of: evenValue) ?? 0
             choiceRule = "Выбери единственное чётное число"
-        } else if let value = primes.first {
-            target = candidates.firstIndex(of: value) ?? 0
-            choiceRule = "Выбери единственное простое число"
         } else {
-            target = 0
-            choiceRule = "Выбери первое число"
+            // Exactly one prime number; the remaining numbers are guaranteed composite.
+            let prime = nextPrime(after: base + 10)
+            candidates = [prime]
+            var value = prime * 2
+            while candidates.count < count {
+                if !isPrime(value) {
+                    candidates.append(value)
+                }
+                value += 1
+            }
+            candidates.shuffle()
+            target = candidates.firstIndex(of: prime) ?? 0
+            choiceRule = "Выбери единственное простое число"
         }
 
         for i in 0..<count {
@@ -353,6 +369,12 @@ final class HundredTrialScene: SKScene {
             b.strokeColor = Palette.textDim
         }
         setStatus(choiceRule)
+    }
+
+    private func nextPrime(after value: Int) -> Int {
+        var n = max(2, value)
+        while !isPrime(n) { n += 1 }
+        return n
     }
 
     private func isPrime(_ n: Int) -> Bool {
