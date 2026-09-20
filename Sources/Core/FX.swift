@@ -53,6 +53,60 @@ enum FX {
         return n
     }
 
+
+    static func atmosphere(in scene: SKScene, accent: SKColor = Palette.cyan) {
+        let glow = SKShapeNode(circleOfRadius: max(scene.size.width, scene.size.height) * 0.32)
+        glow.position = CGPoint(x: scene.size.width * 0.5, y: scene.size.height * 0.48)
+        glow.fillColor = accent.withAlphaComponent(0.035)
+        glow.strokeColor = accent.withAlphaComponent(0.12)
+        glow.lineWidth = 1
+        glow.zPosition = -10
+        scene.addChild(glow)
+        glow.run(.repeatForever(.sequence([
+            .group([.scale(to: 1.08, duration: 2.8), .fadeAlpha(to: 0.045, duration: 2.8)]),
+            .group([.scale(to: 0.94, duration: 2.8), .fadeAlpha(to: 0.12, duration: 2.8)])
+        ])))
+        for i in 0..<18 {
+            let line = SKShapeNode(rectOf: CGSize(width: scene.size.width, height: 1))
+            line.position = CGPoint(x: scene.size.width / 2, y: CGFloat(i) * 34)
+            line.fillColor = accent.withAlphaComponent(0.025)
+            line.strokeColor = .clear
+            line.zPosition = -5
+            scene.addChild(line)
+            line.run(.repeatForever(.sequence([
+                .fadeAlpha(to: 0.06, duration: 1.8),
+                .fadeAlpha(to: 0.015, duration: 1.8)
+            ])))
+        }
+        dust(in: scene, count: 24)
+    }
+
+    static func glitchTitle(_ node: SKNode) {
+        node.run(.repeatForever(.sequence([
+            .wait(forDuration: 2.4),
+            .moveBy(x: -2, y: 0, duration: 0.025),
+            .fadeAlpha(to: 0.72, duration: 0.025),
+            .moveBy(x: 4, y: 0, duration: 0.025),
+            .moveBy(x: -2, y: 0, duration: 0.025),
+            .fadeAlpha(to: 1, duration: 0.05)
+        ])))
+    }
+
+    static func successBurst(in scene: SKScene, at point: CGPoint, color: SKColor = Palette.cyan) {
+        let ring = SKShapeNode(circleOfRadius: 10)
+        ring.position = point
+        ring.fillColor = .clear
+        ring.strokeColor = color
+        ring.lineWidth = 3
+        ring.alpha = 0.9
+        ring.zPosition = 1000
+        scene.addChild(ring)
+        ring.run(.group([
+            .scale(to: 7, duration: 0.45),
+            .fadeOut(withDuration: 0.45)
+        ]), completion: { ring.removeFromParent() })
+    }
+
     static func pulse(_ node: SKNode, scale: CGFloat = 1.06, duration: TimeInterval = 1.2) {
         node.run(.repeatForever(.sequence([
             .scale(to: scale, duration: duration),
