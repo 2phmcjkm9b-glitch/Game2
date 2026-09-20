@@ -6,8 +6,7 @@ final class Trial7_FinalChoice: SKScene {
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
         Audio.shared.start()
-        Audio.shared.drone(freq: 42, duration: 2.0, volume: 0.07)Deep
-        Audio.shared.start()
+        Audio.shared.drone(freq: 42, duration: 2.0, volume: 0.07)
         Audio.shared.drone(freq: 48, duration: 2.0, volume: 0.08)
 
         let title = SKLabelNode(text: "ПОСЛЕДНИЙ ВЫБОР")
