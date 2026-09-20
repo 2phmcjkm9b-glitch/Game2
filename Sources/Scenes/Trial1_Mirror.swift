@@ -156,6 +156,23 @@ final class Trial1_Mirror: SKScene {
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let point = touches.first?.location(in: self) else { return }
+
+        if holdingIndex == nil {
+            for node in nodes(at: point) {
+                var current: SKNode? = node
+                while let candidate = current {
+                    if candidate.name == "backButton" {
+                        let hub = HubScene(size: size)
+                        hub.scaleMode = scaleMode
+                        view?.presentScene(hub, transition: .fade(withDuration: 0.25))
+                        return
+                    }
+                    current = candidate.parent
+                }
+            }
+        }
+
         guard let idx = holdingIndex else { return }
         holdingIndex = nil
 
