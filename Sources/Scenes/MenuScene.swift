@@ -47,7 +47,7 @@ final class MenuScene: SKScene {
         addChild(reset)
 
         let p = SaveManager.shared.progress
-        let prog = SKLabelNode(text: "ПРОЙДЕНО: (Int(p * 7)) / 7")
+        let prog = SKLabelNode(text: "ПРОЙДЕНО: \\(Int(p * 7)) / 7")
         prog.fontName = "AvenirNext-Medium"
         prog.fontSize = 16
         prog.fontColor = Palette.textDim
