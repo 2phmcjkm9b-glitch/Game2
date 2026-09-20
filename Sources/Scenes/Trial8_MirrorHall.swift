@@ -9,6 +9,7 @@ class ActTwoTrialBase: SKScene {
     private var clockChanged = false
     private var wordLabel: SKLabelNode?
     private var wordProgress = ""
+    private var usedLetters: Set<Int> = []
 
     init(size: CGSize, trial: Trial) {
         self.trial = trial
@@ -91,27 +92,39 @@ class ActTwoTrialBase: SKScene {
     }
 
     private func buildMirrorPuzzle() {
-        let box = card("Найди единственное отражение, которое лжёт")
-        targetIndex = Int.random(in: 0..<6)
-        for i in 0..<6 {
-            let c = i % 3
-            let r = i / 3
-            let m = SKShapeNode(rectOf: CGSize(width: size.width * 0.20, height: 82), cornerRadius: 10)
-            m.position = CGPoint(x: CGFloat(c - 1) * size.width * 0.25, y: r == 0 ? 45 : -45)
+        let box = card("Найди одно ложное отражение")
+        targetIndex = Int.random(in: 0..<9)
+        for i in 0..<9 {
+            let col = i % 3
+            let row = i / 3
+            let m = SKShapeNode(rectOf: CGSize(width: size.width * 0.19, height: 68), cornerRadius: 10)
+            m.position = CGPoint(x: CGFloat(col - 1) * size.width * 0.24, y: 72 - CGFloat(row) * 72)
             m.fillColor = SKColor(white: 0.08, alpha: 1)
             m.strokeColor = Palette.cyan.withAlphaComponent(0.7)
             m.name = "mirror_\(i)"
+
             let line = SKShapeNode()
             let p = CGMutablePath()
-            p.move(to: CGPoint(x: -25, y: 25))
-            p.addLine(to: CGPoint(x: 0, y: -18))
-            p.addLine(to: CGPoint(x: 25, y: 25))
-            if i == targetIndex { p.addLine(to: CGPoint(x: 8, y: 8)) }
-            else { p.addLine(to: CGPoint(x: -8, y: 8)) }
+            p.move(to: CGPoint(x: -24, y: 20))
+            p.addLine(to: CGPoint(x: 0, y: -16))
+            p.addLine(to: CGPoint(x: 24, y: 20))
+            p.addLine(to: CGPoint(x: 0, y: 2))
             line.path = p
             line.strokeColor = Palette.text
             line.lineWidth = 2
             m.addChild(line)
+
+            if i == targetIndex {
+                let crack = SKShapeNode()
+                let cp = CGMutablePath()
+                cp.move(to: CGPoint(x: 5, y: 7))
+                cp.addLine(to: CGPoint(x: 11, y: 1))
+                cp.addLine(to: CGPoint(x: 7, y: -6))
+                crack.path = cp
+                crack.strokeColor = Palette.blood.withAlphaComponent(0.85)
+                crack.lineWidth = 1.4
+                m.addChild(crack)
+            }
             box.addChild(m)
         }
     }
@@ -141,42 +154,54 @@ class ActTwoTrialBase: SKScene {
     }
 
     private func buildWhispers() {
-        let box = card("Собери слово: ШКОЛА")
-        let letters = ["Ш","К","О","Л","А","Т","М","Р"]
+        let target = "ШКОЛАТРИНАДЦАТЬСКРЫВАЕТСВОЮТАЙНУНАВСЕГДА"
+        let letters = Array(target)
+        while letters.count < 40 { letters.append(["А","О","Е","И","Т","Р","Н","С"].randomElement()!) }
+        letters.shuffle()
+
+        let box = card("Собери мистическое послание • 40 БУКВ")
+        usedLetters.removeAll()
         for i in 0..<letters.count {
-            let b = SKShapeNode(rectOf: CGSize(width: 58, height: 58), cornerRadius: 10)
-            let c = i % 4
-            let r = i / 4
-            b.position = CGPoint(x: (CGFloat(c) - 1.5) * 68, y: r == 0 ? 42 : -42)
+            let col = i % 5
+            let row = i / 5
+            let b = SKShapeNode(rectOf: CGSize(width: 48, height: 34), cornerRadius: 7)
+            b.position = CGPoint(x: (CGFloat(col) - 2) * 57, y: 92 - CGFloat(row) * 34)
             b.fillColor = SKColor(white: 0.08, alpha: 1)
             b.strokeColor = Palette.magenta
             b.name = "letter_\(i)_\(letters[i])"
-            let l = SKLabelNode(text: letters[i]); l.fontName = "AvenirNext-Heavy"; l.fontSize = 22
-            l.fontColor = Palette.text; l.verticalAlignmentMode = .center; b.addChild(l)
+            let l = SKLabelNode(text: letters[i])
+            l.fontName = "AvenirNext-Heavy"; l.fontSize = 17; l.fontColor = Palette.text
+            l.verticalAlignmentMode = .center
+            b.addChild(l)
             box.addChild(b)
         }
         let selected = SKLabelNode(text: "Выбрано: ")
-        selected.name = "word"
-        selected.fontName = "AvenirNext-Bold"; selected.fontSize = 16; selected.fontColor = Palette.cyan
-        selected.position = CGPoint(x: 0, y: -125); box.addChild(selected)
+        selected.name = "word"; selected.fontName = "AvenirNext-Bold"; selected.fontSize = 13
+        selected.fontColor = Palette.cyan; selected.position = CGPoint(x: 0, y: -128)
+        box.addChild(selected)
         wordLabel = selected
         wordProgress = ""
     }
 
     private func buildShadows() {
-        let box = card("Одна тень лишняя")
-        targetIndex = Int.random(in: 0..<8)
-        for i in 0..<8 {
-            let c = i % 4
-            let r = i / 4
-            let s = SKShapeNode(ellipseOf: CGSize(width: 72, height: 54))
-            s.position = CGPoint(x: (CGFloat(c) - 1.5) * 68, y: r == 0 ? 42 : -42)
+        let box = card("Найди одну тень, которая отличается")
+        targetIndex = Int.random(in: 0..<15)
+        for i in 0..<15 {
+            let col = i % 5
+            let row = i / 5
+            let s = SKShapeNode(ellipseOf: CGSize(width: 48, height: 40))
+            s.position = CGPoint(x: CGFloat(col - 2) * 58, y: 76 - CGFloat(row) * 58)
             s.fillColor = SKColor(white: 0.01, alpha: 1)
-            s.strokeColor = Palette.blood.withAlphaComponent(0.6)
+            s.strokeColor = Palette.blood.withAlphaComponent(0.55)
             s.name = "shadow_\(i)"
             if i == targetIndex {
-                s.xScale = 1.25
-                s.yScale = 0.75
+                s.xScale = 1.09
+                s.yScale = 0.93
+                let notch = SKShapeNode(circleOfRadius: 3)
+                notch.position = CGPoint(x: 12, y: 8)
+                notch.fillColor = Palette.bgDeep
+                notch.strokeColor = .clear
+                s.addChild(notch)
             }
             box.addChild(s)
         }
@@ -205,18 +230,19 @@ class ActTwoTrialBase: SKScene {
     }
 
     private func buildRhyme() {
-        let box = card("Продолжи считалку")
-        let q = SKLabelNode(text: "Раз, два, три — ...")
-        q.fontName = "AvenirNext-Heavy"; q.fontSize = 24; q.fontColor = Palette.text
+        let box = card("Продолжи закономерность")
+        let q = SKLabelNode(text: "2 • 5 • 10 • 17 • 26 • ?")
+        q.fontName = "AvenirNext-Heavy"; q.fontSize = 23; q.fontColor = Palette.text
         q.position = CGPoint(x: 0, y: 65); box.addChild(q)
-        let answers = ["смотри","четыре","замри","иди"]
-        for i in 0..<4 {
-            let b = SKShapeNode(rectOf: CGSize(width: 145, height: 48), cornerRadius: 9)
-            b.position = CGPoint(x: i % 2 == 0 ? -82 : 82, y: i < 2 ? 5 : -55)
+        let answers = ["31","35","37","39","42","45"]
+        for i in 0..<answers.count {
+            let b = SKShapeNode(rectOf: CGSize(width: 115, height: 42), cornerRadius: 9)
+            b.position = CGPoint(x: (i % 2 == 0 ? -78 : 78), y: 10 - CGFloat(i / 2) * 52)
             b.fillColor = SKColor(white: 0.07, alpha: 1)
             b.strokeColor = Palette.cyan.withAlphaComponent(0.7)
             b.name = "rhyme_\(i)"
-            let l = SKLabelNode(text: answers[i]); l.fontName = "AvenirNext-Bold"; l.fontSize = 14; l.fontColor = Palette.text; l.verticalAlignmentMode = .center
+            let l = SKLabelNode(text: answers[i]); l.fontName = "AvenirNext-Bold"; l.fontSize = 14
+            l.fontColor = Palette.text; l.verticalAlignmentMode = .center
             b.addChild(l); box.addChild(b)
         }
         targetIndex = 2
@@ -252,19 +278,25 @@ class ActTwoTrialBase: SKScene {
                 }
                 if name.hasPrefix("letter_") {
                     let parts = name.split(separator: "_")
-                    if parts.count >= 3, let letterNode = wordLabel {
+                    if parts.count >= 3, let index = Int(parts[1]), let letterNode = wordLabel {
+                        guard !usedLetters.contains(index) else { return }
                         let letter = String(parts[2])
-                        let target = "ШКОЛА"
+                        let target = "ШКОЛАТРИНАДЦАТЬСКРЫВАЕТСВОЮТАЙНУНАВСЕГДА"
                         let next = wordProgress + letter
                         if target.hasPrefix(next) {
+                            usedLetters.insert(index)
+                            n.alpha = 0.28
                             wordProgress = next
                             letterNode.text = "Выбрано: " + next
-                            Audio.shared.tone(freq: 300 + Double(next.count) * 70, duration: 0.09, volume: 0.14)
+                            Audio.shared.tone(freq: 300 + Double(next.count) * 18, duration: 0.09, volume: 0.14)
                             if next == target { complete() }
                         } else {
                             wordProgress = ""
-                            letterNode.text = "Выбрано: "
+                            usedLetters.removeAll()
+                            self.childNode(withName: "//letter_")?.removeAllActions()
+                            letterNode.text = "ОШИБКА • начни заново"
                             failPulse(n)
+                            self.enumerateChildNodes(withName: "//letter_*") { node, _ in node.alpha = 1.0 }
                         }
                     }
                     return
