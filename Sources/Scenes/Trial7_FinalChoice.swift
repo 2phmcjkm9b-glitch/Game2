@@ -83,9 +83,8 @@ final class Trial7_FinalChoice: SKScene {
 
     private func finish(_ ending: Int) {
         finished = true
-        SaveManager.shared.data.ending = ending
+        SaveManager.shared.setEnding(ending)
         SaveManager.shared.complete(7)
-        SaveManager.shared.save()
 
         let result = SKLabelNode(text: ending == 1 ? "Ты остался." : "Ты ушёл.")
         result.fontName = "AvenirNext-Bold"
