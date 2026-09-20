@@ -51,7 +51,7 @@ class ActTwoTrialBase: SKScene {
         bl.fontName = "AvenirNext-Bold"
         bl.fontSize = 13
         bl.fontColor = Palette.text
-        bl.verticalAlignmentMode = .center
+        bl.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center
         back.addChild(bl)
         addChild(back)
     }
@@ -169,7 +169,7 @@ class ActTwoTrialBase: SKScene {
             b.fillColor = SKColor(white: 0.08, alpha: 1)
             b.strokeColor = Palette.magenta
             b.name = "letter_\(i)_\(letters[i])"
-            let l = SKLabelNode(text: letters[i])
+            let l = SKLabelNode(text: String(letters[i]))
             l.fontName = "AvenirNext-Heavy"; l.fontSize = 17; l.fontColor = Palette.text
             l.verticalAlignmentMode = .center
             b.addChild(l)
