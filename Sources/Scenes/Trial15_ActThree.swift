@@ -32,7 +32,7 @@ class ActThreeTrialBase: SKScene {
     }
 
     private func box(_ text:String)->SKShapeNode {
-        let b=SKShapeNode(rectOf:CGSize(width:size.width*0.84,height:310),cornerRadius:18)
+        let b=SKShapeNode(rectOf:CGSize(width:size.width*0.84,height:360),cornerRadius:18)
         b.position=CGPoint(x:size.width/2,y:size.height*0.48); b.fillColor=SKColor(white:0.045,alpha:1); b.strokeColor=Palette.magenta; b.lineWidth=2
         let l=SKLabelNode(text:text); l.fontName="AvenirNext-Bold"; l.fontSize=15; l.fontColor=Palette.text; l.position=CGPoint(x:0,y:120); b.addChild(l); addChild(b); return b
     }
@@ -63,9 +63,9 @@ class ActThreeTrialBase: SKScene {
 
     private func buildStairs() {
         let b=box("Запомни безопасную ступень на каждом ряду")
-        sequence=[Int.random(in:0..<3),Int.random(in:0..<3),Int.random(in:0..<3),Int.random(in:0..<3)]
-        for r in 0..<4 { for c in 0..<3 {
-            let n=button(b,"\(c+1)","step_\(r)_\(c)",CGFloat(c-1)*88,CGFloat(75-r*48))
+        sequence=(0..<8).map { _ in Int.random(in:0..<3) }
+        for r in 0..<8 { for c in 0..<3 {
+            let n=button(b,"\(c+1)","step_\(r)_\(c)",CGFloat(c-1)*88,CGFloat(82-r*38))
             n.strokeColor = Palette.textDim
             n.alpha = 0.55
         }}
@@ -74,7 +74,7 @@ class ActThreeTrialBase: SKScene {
             .wait(forDuration:0.5),
             .run { [weak self] in
                 guard let self else { return }
-                for r in 0..<4 {
+                for r in 0..<8 {
                     let c=self.sequence[r]
                     if let n=self.childNode(withName:"//step_\(r)_\(c)") as? SKShapeNode {
                         n.run(.sequence([
@@ -85,14 +85,14 @@ class ActThreeTrialBase: SKScene {
                             .fadeAlpha(to:0.55,duration:0.10)
                         ]))
                     }
-                    if r < 3 {
+                    if r < 7 {
                         self.run(.wait(forDuration:0.58))
                     }
                 }
             },
-            .wait(forDuration:2.9),
+            .wait(forDuration:5.4),
             .run { [weak self] in
-                (self?.childNode(withName:"//status") as? SKLabelNode)?.text="Теперь выбери 4 ступени"
+                (self?.childNode(withName:"//status") as? SKLabelNode)?.text="Теперь выбери 8 ступеней"
             }
         ]))
     }
@@ -161,9 +161,9 @@ class ActThreeTrialBase: SKScene {
 
     private func buildSchoolBell() {
         let b=box("Останови часы ровно на 13:13")
-        let clock=SKLabelNode(text:"13:10"); clock.name="clock"; clock.fontName="AvenirNext-Heavy"; clock.fontSize=46; clock.fontColor=Palette.text; clock.position=CGPoint(x:0,y:25); b.addChild(clock)
+        let clock=SKLabelNode(text:"13:07"); clock.name="clock"; clock.fontName="AvenirNext-Heavy"; clock.fontSize=46; clock.fontColor=Palette.text; clock.position=CGPoint(x:0,y:25); b.addChild(clock)
         let stop=button(b,"ОСТАНОВИТЬ","stopClock",0,-60)
-        let vals=["13:10","13:11","13:12","13:13","13:14","13:15"]
+        let vals=["13:07","13:08","13:09","13:10","13:11","13:12","13:13","13:14","13:15","13:16","13:17","13:18"]
         run(.repeatForever(.sequence([
             .wait(forDuration:0.65),
             .run { [weak self,weak clock] in
@@ -189,7 +189,7 @@ class ActThreeTrialBase: SKScene {
             if node.name=="backButton" { back(); return }
             guard let name=node.name else { n=node.parent; continue }
             if name.hasPrefix("code_"),let v=Int(name.dropFirst(5)) { input.append(v); updateStatus(); if input.count==sequence.count { input == sequence ? complete() : resetInput() }; return }
-            if name.hasPrefix("step_") { let parts=name.split(separator:"_"); if parts.count==3,let r=Int(parts[1]),let c=Int(parts[2]) { if c==sequence[r] { input.append(r); if input.count==4 {complete()} } else { failPulse(node); input.removeAll() } }; return }
+            if name.hasPrefix("step_") { let parts=name.split(separator:"_"); if parts.count==3,let r=Int(parts[1]),let c=Int(parts[2]) { if c==sequence[r] { input.append(r); if input.count==8 {complete()} } else { failPulse(node); input.removeAll() } }; return }
             if name.hasPrefix("bell_"),let i=Int(name.dropFirst(5)) { input.append(i); let ok=input.indices.allSatisfy { input[$0]==sequence[$0] }; if !ok {resetInput()} else if input.count==sequence.count {complete()}; return }
             if name.hasPrefix("item_"),let i=Int(name.dropFirst(5)) { i==target ? complete() : failPulse(node); return }
             if name.hasPrefix("note_"),let i=Int(name.dropFirst(5)) {
