@@ -1,143 +1,62 @@
 import SpriteKit
 
 final class HubScene: SKScene {
-    private let rooms: [(CGFloat, CGFloat, Trial)] = [
-        (0.20, 0.75, .mirror),
-        (0.50, 0.75, .melody),
-        (0.80, 0.75, .darkCorridor),
-        (0.20, 0.50, .doors),
-        (0.50, 0.50, .dontLookAway),
-        (0.80, 0.50, .notes),
-        (0.50, 0.22, .finalChoice)
-    ]
-
     override func didMove(to view: SKView) {
         backgroundColor = Palette.bg
-        FX.dust(in: self, count: 20)
-        addChild(VignetteNode(size: size, intensity: 0.8))
 
-        let header = SKLabelNode(text: "КАРТА ШКОЛЫ")
-        header.fontName = "AvenirNext-Bold"
-        header.fontSize = 26
-        header.fontColor = Palette.text
-        header.position = CGPoint(x: size.width / 2, y: size.height * 0.92)
-        addChild(header)
+        let title = SKLabelNode(text: "ИСПЫТАНИЯ")
+        title.fontName = "AvenirNext-Bold"
+        title.fontSize = 30
+        title.fontColor = Palette.cyan
+        title.position = CGPoint(x: size.width / 2, y: size.height * 0.86)
+        title.verticalAlignmentMode = .center
+        addChild(title)
 
-        for (rx, ry, trial) in rooms {
-            let pos = CGPoint(x: size.width * rx, y: size.height * ry)
-            let done = SaveManager.shared.data.completedTrials.contains(trial.rawValue)
-            let locked = isLocked(trial)
-            let door = makeDoor(trial: trial, done: done, locked: locked)
-            door.position = pos
-            door.name = "trial_(trial.rawValue)"
-            addChild(door)
-        }
+        let info = SKLabelNode(text: "Выберите испытание")
+        info.fontName = "AvenirNext-Regular"
+        info.fontSize = 18
+        info.fontColor = Palette.textDim
+        info.position = CGPoint(x: size.width / 2, y: size.height * 0.76)
+        info.verticalAlignmentMode = .center
+        addChild(info)
 
-        let back = NeonButton(title: "←", size: CGSize(width: 56, height: 44), color: Palette.textDim)
-        back.position = CGPoint(x: 46, y: size.height - 44)
-        back.name = "backButton"
+        let start = SKLabelNode(text: "ИСПЫТАНИЕ 1  —  ЗЕРКАЛО")
+        start.fontName = "AvenirNext-Bold"
+        start.fontSize = 20
+        start.fontColor = Palette.text
+        start.name = "trial1"
+        start.position = CGPoint(x: size.width / 2, y: size.height * 0.55)
+        start.verticalAlignmentMode = .center
+        addChild(start)
+
+        let back = SKLabelNode(text: "← НАЗАД")
+        back.fontName = "AvenirNext-Bold"
+        back.fontSize = 18
+        back.fontColor = Palette.textDim
+        back.name = "back"
+        back.position = CGPoint(x: size.width / 2, y: size.height * 0.18)
+        back.verticalAlignmentMode = .center
         addChild(back)
-    }
-
-    private func isLocked(_ trial: Trial) -> Bool {
-        for i in 1..<trial.rawValue {
-            if !SaveManager.shared.data.completedTrials.contains(i) { return true }
-        }
-        return false
-    }
-
-    private func makeDoor(trial: Trial, done: Bool, locked: Bool) -> SKNode {
-        let node = SKNode()
-        let w = size.width * 0.26
-        let h = size.height * 0.14
-
-        let rect = SKShapeNode(rectOf: CGSize(width: w, height: h), cornerRadius: 12)
-        rect.fillColor = SKColor(white: 0.05, alpha: 0.95)
-        rect.strokeColor = locked ? SKColor(white: 0.25, alpha: 1) : (done ? Palette.amber : Palette.cyan)
-        rect.lineWidth = 2
-        rect.glowWidth = locked ? 0 : (done ? 4 : 8)
-        node.addChild(rect)
-
-        let num = SKLabelNode(text: "(trial.rawValue)")
-        num.fontName = "AvenirNext-Heavy"
-        num.fontSize = 22
-        num.fontColor = locked ? Palette.textDim : Palette.text
-        num.position = CGPoint(x: -w / 2 + 22, y: 0)
-        num.verticalAlignmentMode = .center
-        node.addChild(num)
-
-        let name = SKLabelNode(text: trial.title)
-        name.fontName = "AvenirNext-Bold"
-        name.fontSize = 14
-        name.fontColor = locked ? Palette.textDim : Palette.text
-        name.position = CGPoint(x: 12, y: 8)
-        name.verticalAlignmentMode = .center
-        node.addChild(name)
-
-        let sub = SKLabelNode(text: locked ? "закрыто" : (done ? "✓ пройдено" : trial.subtitle))
-        sub.fontName = "AvenirNext-Regular"
-        sub.fontSize = 11
-        sub.fontColor = locked ? Palette.textDim : (done ? Palette.amber : Palette.textDim)
-        sub.position = CGPoint(x: 12, y: -10)
-        sub.verticalAlignmentMode = .center
-        node.addChild(sub)
-
-        if !locked {
-            rect.run(.repeatForever(.sequence([
-                .fadeAlpha(to: 0.75, duration: 1.4),
-                .fadeAlpha(to: 1.0, duration: 1.4)
-            ])))
-        }
-        return node
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let point = touches.first?.location(in: self) else { return }
 
         for node in nodes(at: point) {
-            var current: SKNode? = node
-            while let candidate = current {
-                guard let name = candidate.name else {
-                    current = candidate.parent
-                    continue
-                }
+            if node.name == "back" {
+                let menu = MenuScene(size: size)
+                menu.scaleMode = .resizeFill
+                view?.presentScene(menu)
+                return
+            }
 
-                if name == "backButton" {
-                    let menu = MenuScene(size: size)
-                    menu.scaleMode = scaleMode
-                    view?.presentScene(menu, transition: .fade(withDuration: 0.4))
-                    return
-                }
-
-                if name.hasPrefix("trial_"),
-                   let raw = Int(name.dropFirst(6)),
-                   let trial = Trial(rawValue: raw) {
-                    if isLocked(trial) {
-                        Haptics.error()
-                    } else {
-                        launch(trial)
-                    }
-                    return
-                }
-
-                current = candidate.parent
+            if node.name == "trial1" {
+                // Пока проверяем сам переход отдельно от сложных игровых сцен.
+                let scene = Trial1_Mirror(size: size)
+                scene.scaleMode = .resizeFill
+                view?.presentScene(scene)
+                return
             }
         }
-    }
-
-    private func launch(_ trial: Trial) {
-        Haptics.medium()
-        let scene: SKScene
-        switch trial {
-        case .mirror: scene = Trial1_Mirror(size: size)
-        case .melody: scene = Trial2_Melody(size: size)
-        case .darkCorridor: scene = Trial3_DarkCorridor(size: size)
-        case .doors: scene = Trial4_Doors(size: size)
-        case .dontLookAway: scene = Trial5_DontLookAway(size: size)
-        case .notes: scene = Trial6_Notes(size: size)
-        case .finalChoice: scene = Trial7_FinalChoice(size: size)
-        }
-        scene.scaleMode = scaleMode
-        view?.presentScene(scene, transition: .fade(withDuration: 0.6))
     }
 }
