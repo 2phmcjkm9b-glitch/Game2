@@ -5,11 +5,6 @@ enum GameFlow {
         SaveManager.shared.complete(trial.rawValue, time: time)
         Haptics.success()
         Audio.shared.tone(freq: 1320, duration: 0.25, volume: 0.25)
-        if trial == .finalChoice && SaveManager.shared.data.actTwoUnlocked && !UserDefaults.standard.bool(forKey: "school13.actTwoAnnounced") {
-            UserDefaults.standard.set(true, forKey: "school13.actTwoAnnounced")
-            showActTwoBanner(in: scene)
-            return
-        }
         scene.run(.sequence([
             .wait(forDuration: delay),
             .run {
