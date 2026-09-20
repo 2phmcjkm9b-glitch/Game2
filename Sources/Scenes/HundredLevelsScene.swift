@@ -27,11 +27,11 @@ final class HundredLevelsScene: SKScene {
             card.lineWidth=1.5; card.name="level_(level.id)"; card.zPosition=10
             let num=SKLabelNode(text:String(format:"%02d",level.id))
             num.fontName="AvenirNext-Heavy"; num.fontSize=18; num.fontColor=Palette.blood
-            num.horizontalAlignmentMode=.left; num.verticalAlignmentMode=.center
+            num.horizontalAlignmentMode = .left; num.verticalAlignmentMode = .center
             num.position=CGPoint(x:-card.frame.width/2+12,y:0); num.name=card.name; card.addChild(num)
             let name=SKLabelNode(text:level.title.uppercased())
             name.fontName="AvenirNext-Bold"; name.fontSize=9; name.fontColor=Palette.text
-            name.horizontalAlignmentMode=.left; name.verticalAlignmentMode=.center
+            name.horizontalAlignmentMode = .left; name.verticalAlignmentMode = .center
             name.position=CGPoint(x:-card.frame.width/2+50,y:0); name.name=card.name; card.addChild(name)
             addChild(card)
         }
@@ -45,7 +45,7 @@ final class HundredLevelsScene: SKScene {
         let b=SKShapeNode(rectOf:CGSize(width:120,height:42),cornerRadius:10)
         b.position=CGPoint(x:x,y:y); b.fillColor=Palette.panel; b.strokeColor=Palette.textDim; b.name=name; b.zPosition=30
         let l=SKLabelNode(text:text); l.fontName="AvenirNext-Bold"; l.fontSize=13; l.fontColor=Palette.text
-        l.verticalAlignmentMode=.center; l.name=name; b.addChild(l)
+        l.verticalAlignmentMode = .center; l.name=name; b.addChild(l)
         return b
     }
 
