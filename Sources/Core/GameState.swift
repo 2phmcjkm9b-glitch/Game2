@@ -31,5 +31,5 @@ enum Trial: Int, CaseIterable {
 
     static var actOne: [Trial] { allCases.filter { $0.act == 1 } }
     static var actTwo: [Trial] { allCases.filter { $0.act == 2 } }
-    static var actThree: [Trial] { allCases.filter { $0.act == 3 } }
+    static var actThree: [Trial] { allCases.filter { $0.act == 3 && $0 != .bell && $0 != .notebook } }
 }
